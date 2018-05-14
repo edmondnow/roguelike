@@ -1,0 +1,79 @@
+p {
+  position: fixed;
+  z-index: 2;
+  color: red;
+  font-size: 1.2em;
+  margin: 0 !important
+}
+
+a{
+  position: relative;
+  margin-right: 20px;
+}
+.btn {
+  display: inline-block;
+  margin-left: 20px;
+  font-size: 10px !important;
+  position: relative;
+  top: -2.5px;
+  min-width: 100px !important;
+}
+
+.panel-title {
+  align-items: left;
+  display: flex;
+
+}
+
+#gen {
+  display: inline-block;
+  float: right !important;
+  position:absolute;
+    right:20px;
+    top:7.5px;
+}
+
+.badge {
+  padding: 10px 10px;
+  font-family: monospace;
+}
+  
+canvas {
+  display: block;
+  margin:  0 auto;
+  background-color: black;
+  margin: 0 !important;
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2em;
+  margin: 0 !important;
+  text-align: left;
+} 
+body {
+  margin: 0 !important;
+  overflow-y: hidden;
+}
+
+#accordion {
+  margin: 0 !important;
+  border: none;
+}
+
+.panel-heading, .panel-body, .panel {
+  background-color: black !important;
+  border: none !important;
+  color: white !important;
+}
+
+a {
+  text-decoration: none !important
+}
+
+
+.glyphicon {
+  position: relative;
+  color: white;
+  top: 5px;
+}
