@@ -29,6 +29,7 @@
     "express": "^4.16.3",
     "marked": "^0.3.19",
     "npm": "^6.0.0",
+    "phaser": "^3.7.1",
     "react": "16.3.2",
     "react-bootstrap": "^0.32.1",
     "react-dom": "16.3.2",
