@@ -1,135 +1,75 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import Phaser from 'phaser';
 
 class App extends Component{
   constructor(props){
     super(props)
     
-    var player, cursors, game, platforms, stars;
-    function preload ()
-    {
-      this.load.image('sky', './src/assets/sky.png');
-      this.load.image('ground', './src/assets/platform.png');
-      this.load.image('star', './src/assets/star.png');
-      this.load.image('bomb', './src/assets/bomb.png');
-      this.load.spritesheet('dude', 
-          './src/assets/dude.png',
-          { frameWidth: 32, frameHeight: 48 }
-      );
-    }
-
-
-
-    function create ()
-    {
-      this.add.image(400, 300, 'sky');
-      platforms = this.physics.add.staticGroup();
-      platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-      platforms.create(600, 400, 'ground');
-      platforms.create(50, 250, 'ground');
-      platforms.create(750, 220, 'ground');
-
-      player = this.physics.add.sprite(100, 450, 'dude');
-      player.setBounce(0.2);
-      player.setCollideWorldBounds(true);
-      player.body.setGravityY(300)
-      
-      this.anims.create({
-          key: 'left',
-          frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-          frameRate: 10,
-          repeat: -1
-      });
-
-      this.anims.create({
-          key: 'turn',
-          frames: [ { key: 'dude', frame: 4 } ],
-          frameRate: 20
-      });
-
-      this.anims.create({
-          key: 'right',
-          frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-          frameRate: 10,
-          repeat: -1
-      });
-
-      cursors = this.input.keyboard.createCursorKeys();
-      this.physics.add.collider(player, platforms);
-      stars = this.physics.add.group({
-          key: 'star',
-          repeat: 11,
-          setXY: { x: 12, y: 0, stepX: 70 }
-      });
-
-      stars.children.iterate(function (child) {
-
-          child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
-      });
-
-      this.physics.add.collider(stars, platforms);
-      this.physics.add.overlap(player, stars, collectStar, null, this);
-      function collectStar (player, star)
-      {
-          star.disableBody(true, true);
-      }
-    }
-
-    function update ()
-
-    {
-
-      
-      if (cursors.left.isDown)
-      {
-          player.setVelocityX(-160);
-
-          player.anims.play('left', true);
-      }
-      else if (cursors.right.isDown)
-      {
-          player.setVelocityX(160);
-
-          player.anims.play('right', true);
-      }
-      else
-      {
-          player.setVelocityX(0);
-
-          player.anims.play('turn');
-      }
-
-      if (cursors.up.isDown && player.body.touching.down)
-      {
-          player.setVelocityY(-430);
-      }
-    }
-    let config = {
-      type: Phaser.AUTO,
-      width: 800,
-      height: 600,
-      physics: {
-          default: 'arcade',
-          arcade: {
-              gravity: { y: 300 },
-              debug: false
-          }
-      },
-      scene: {
-        preload: preload,
-        create: create,
-        update: update
-      }
-    };
-    this.state = { config, game, player, cursors };
-    
+    this.create = this.create.bind(this);
+    this.update = this.update.bind(this)
   }
 
   componentDidMount(){
-    let game = new Phaser.Game(this.state.config);
-    this.setState({game})
+    this.game = new Phaser.Game(800, 600, Phaser.AUTO, "phaser-container", 
+        { 
+          create: this.create,
+          update: this.update
+,          preload: this.preload
+        }
+   );
+  }
+
+  preload(){
+    let { game } = this;
+    game.load.image('cat', './src/assets/cat.png');
+    game.load.image('tiles', './src/assets/tmw_desert_spacing.png');
+    game.load.tilemap('desert', './src/assets/desert.json', null, Phaser.Tilemap.TILED_JSON);
+    
+  }
+  
+  create(){
+    let { game } = this;
+    let cursors = game.input.keyboard.createCursorKeys();
+
+    let map = game.add.tilemap('desert');
+    let layer = map.createLayer('Ground');
+    let cat = game.add.sprite(450, 80, 'cat');
+    
+    //Physics
+    game.physics.startSystem(Phaser.Physics.P2JS);
+    game.physics.p2.defaultRestitution = 0.8;
+    game.physics.p2.enable(cat);
+    game.camera.follow(cat);
+
+    //Cat
+    cat.scale.setTo(1, 1)
+    cat.body.setZeroDamping();
+    cat.body.fixedRotation = true;
+    cat.anchor.setTo(0.5, 0.5);
+
+    //Layers, map and stage
+    game.stage.backgroundColor = '#2d2d2d';
+    map.addTilesetImage('Desert', 'tiles');
+    layer.resizeWorld();
+    //Export to class
+    this.cat = cat;
+    this.cursors  = cursors;
+    this.map = map;
+  }
+
+  update(){
+    let { body } = this.cat;
+    let cursors = this.cursors;
+    body.setZeroVelocity();
+
+    if (cursors.left.isDown)
+      body.moveLeft(400);
+    else if (cursors.right.isDown)
+      body.moveRight(400);
+    if (cursors.up.isDown)
+      body.moveUp(400);
+    else if (cursors.down.isDown)
+      body.moveDown(400);
   }
 
   render(){
