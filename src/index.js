@@ -24,11 +24,15 @@ class App extends Component{
     game.load.image('DungeonTileset', './src/assets/DungeonTileset.png');
     game.load.image('WallTileset', './src/assets/WallTileset.png');
     game.load.tilemap('DungeonTilemap', './src/assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-    game.load.image('player', './src/assets/player.png');
+    //game.load.image('player', './src/assets/player.png');
+   //game.load.spritesheet('player', './src/assets/player.png',36, 44);
+    game.load.atlasJSONHash('player', './src/assets/player.png', './src/assets/player.json');
+    // game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
     
   }
   
   create(){
+    let fps = 12;
     let { game } = this;
     let cursors = game.input.keyboard.createCursorKeys();
 
@@ -47,11 +51,12 @@ class App extends Component{
     let backgroundDetails = map.createLayer('backgrounddetails');
     let floor = map.createLayer('floor'); 
     let floorDetails = map.createLayer('floordetails');
-    //add player
-        let foreground = map.createLayer('foreground');
+    
+    let foreground = map.createLayer('foreground');
     let foregroundDetails = map.createLayer('foregrounddetails');
-    let player = game.add.sprite(160, 155, 'player');
-    player.anchor.set(0.5, 0.5)
+    //add player
+    let player = game.add.sprite(160, 155, 'player', 'idle/0.png');
+    
 
     let foregroundTops = map.createLayer('foregroundtops');
     background.resizeWorld();
@@ -67,13 +72,19 @@ class App extends Component{
     //player
     
     game.physics.p2.enable(player);
+    player.animations.add('right', Phaser.Animation.generateFrameNames('right/', 0, 5, '.png', 1), fps, true, false);
+    player.animations.add('left', Phaser.Animation.generateFrameNames('left/', 0, 5, '.png', 1), fps, true, false);
+    player.animations.add('up', Phaser.Animation.generateFrameNames('up/', 0, 3, '.png', 1), fps, true, false);
+    player.animations.add('down', Phaser.Animation.generateFrameNames('down/', 0, 3, '.png', 1), fps, true, false);
+    player.animations.add('idle', Phaser.Animation.generateFrameNames('idle/', 0, 2, '.png', 1), fps-6, true, false);
     player.body.fixedRotation = true; // no rotation
     player.body.collideWorldBounds = true;
-    player.body.clearShapes();  
+    player.body.clearShapes(); 
+    player.scale.setTo(0.5, 0.5)
+    player.anchor.setTo(.5,.5);
     //Only the lower part of the player collides
-    player.body.addRectangle(7, 7, 0, 5)
-    player.body.debug = true;
-    //player.body.debug = true;
+    player.body.addRectangle(10, 6, -1, 4)
+    // /player.body.debug = true;
     //Export to class
     this.player = player;
     this.cursors  = cursors;
@@ -83,18 +94,27 @@ class App extends Component{
   }
 
   update(){
+
+    let speed = 80;
     let { player: { body }  } = this;
     let { cursors, game, player, foreground } = this;
     body.setZeroVelocity();
 
-    if (cursors.left.isDown)
-      body.moveLeft(400);
-    else if (cursors.right.isDown)
-      body.moveRight(400);
-    if (cursors.up.isDown)
-      body.moveUp(400);
-    else if (cursors.down.isDown)
-      body.moveDown(400);
+    if (cursors.left.isDown){
+      body.moveLeft(speed);
+      player.animations.play('left');
+    }  else if(cursors.right.isDown){
+      body.moveRight(speed);
+      player.animations.play('right');
+    } if (cursors.up.isDown){
+      body.moveUp(speed);
+      player.animations.play('up');
+    }  else if(cursors.down.isDown){
+      body.moveDown(speed);
+      player.animations.play('down');
+    } else if (cursors.down.isUp && cursors.up.isUp && cursors.left.isUp && cursors.right.isUp){
+        player.animations.play('idle');
+    }
   }
 
   render(){
