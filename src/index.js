@@ -10,7 +10,7 @@ class App extends Component{
   }
 
   componentDidMount(){
-    this.game = new Phaser.Game(800, 600, Phaser.AUTO, "phaser-container", 
+    this.game = new Phaser.Game(960, 576, Phaser.AUTO, "phaser-container", 
         { 
           create: this.create,
           update: this.update
@@ -21,9 +21,10 @@ class App extends Component{
 
   preload(){
     let { game } = this;
-    game.load.image('cat', './src/assets/cat.png');
-    game.load.image('tiles', './src/assets/tmw_desert_spacing.png');
-    game.load.tilemap('desert', './src/assets/desert.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.image('DungeonTileset', './src/assets/DungeonTileset.png');
+    game.load.image('WallTileset', './src/assets/WallTileset.png');
+    game.load.tilemap('DungeonTilemap', './src/assets/map.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.image('player', './src/assets/player.png');
     
   }
   
@@ -31,35 +32,59 @@ class App extends Component{
     let { game } = this;
     let cursors = game.input.keyboard.createCursorKeys();
 
-    let map = game.add.tilemap('desert');
-    let layer = map.createLayer('Ground');
-    let cat = game.add.sprite(450, 80, 'cat');
-    
-    //Physics
-    game.physics.startSystem(Phaser.Physics.P2JS);
-    game.physics.p2.defaultRestitution = 0.8;
-    game.physics.p2.enable(cat);
-    game.camera.follow(cat);
 
-    //Cat
-    cat.scale.setTo(1, 1)
-    cat.body.setZeroDamping();
-    cat.body.fixedRotation = true;
-    cat.anchor.setTo(0.5, 0.5);
+    
+
+
 
     //Layers, map and stage
     game.stage.backgroundColor = '#2d2d2d';
-    map.addTilesetImage('Desert', 'tiles');
-    layer.resizeWorld();
+
+    let map = game.add.tilemap('DungeonTilemap');
+    map.addTilesetImage('DungeonTileset', 'DungeonTileset');
+    map.addTilesetImage('WallTileset', 'WallTileset');
+    let background = map.createLayer('background');
+    let backgroundDetails = map.createLayer('backgrounddetails');
+    let floor = map.createLayer('floor'); 
+    let floorDetails = map.createLayer('floordetails');
+    //add player
+        let foreground = map.createLayer('foreground');
+    let foregroundDetails = map.createLayer('foregrounddetails');
+    let player = game.add.sprite(160, 155, 'player');
+    player.anchor.set(0.5, 0.5)
+
+    let foregroundTops = map.createLayer('foregroundtops');
+    background.resizeWorld();
+    //Physics
+    game.physics.startSystem(Phaser.Physics.P2JS);
+    map.setCollisionBetween(1, 999, true, "foreground");
+    map.setCollisionBetween(1, 999, true, "foregrounddetails");
+    map.setCollisionBetween(1, 999, true, "backgrounddetails")
+    game.physics.p2.convertTilemap(map, "foreground");
+    game.physics.p2.convertTilemap(map, "foregrounddetails");
+    game.physics.p2.convertTilemap(map, "backgrounddetails");
+
+    //player
+    
+    game.physics.p2.enable(player);
+    player.body.fixedRotation = true; // no rotation
+    player.body.collideWorldBounds = true;
+    player.body.clearShapes();  
+    //Only the lower part of the player collides
+    player.body.addRectangle(7, 7, 0, 5)
+    player.body.debug = true;
+    //player.body.debug = true;
     //Export to class
-    this.cat = cat;
+    this.player = player;
     this.cursors  = cursors;
     this.map = map;
+    this.foreground = foreground;
+
   }
 
   update(){
-    let { body } = this.cat;
-    let cursors = this.cursors;
+    let { player: { body }  } = this;
+    let { cursors, game, player, foreground } = this;
     body.setZeroVelocity();
 
     if (cursors.left.isDown)
