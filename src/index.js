@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import StatusBar from './components/statusbar';
 
-class App extends Component{
+class PhaserGame extends Component{
   constructor(props){
     super(props)
-
+    let path = './src/assets';
 
     this.state = {
       movement: true,
@@ -12,14 +13,14 @@ class App extends Component{
       xp: 0,
       lvl: 1,
       dmg: 10,
-      weapon: 'dagger',
+      weapon: `${path}/sword.png`,
       restitution: 3,
 
     }
     
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
-    //this.dmg = this.dmg.bind(this);
+    this.preload = this.preload.bind(this);
   }
 
   componentDidMount(){
@@ -36,22 +37,48 @@ class App extends Component{
     let { game } = this;
     let path = './src/assets';
 
+    //Specify all assets in an object to iterate over
+    let assets = [
+      { name: 'char', variable: null, type: 'player', mode: 'atlas', path: `${path}/char/char`, debug: false,
+        coordx: 160, coordy: 155, scale: 0.5, rect: {w: 15 , h: 7.5 , ox: -1, oy: 4, rotation: null }, anim: [
+          { name: 'right' , count: 5 , fps: 9 },
+          { name: 'left' , count: 5 , fps: 9 },
+          { name: 'up' , count: 3 , fps: 9 },
+          { name: 'down' , count: 3 , fps: 9 },
+          { name: 'idle' , count: 2 , fps: 3 }
+        ]
+       },
+      { name: 'potion', variable: null, type: 'item', mode: 'image', path: `${path}/potion`, debug: true,
+        coordx: 190, coordy: 155, scale: 0.05, rect: {w: 7 , h: 7.5 , ox: -1, oy: 4, rotation: null }
+      },
+      { name: 'sword', variable: null, type: 'item', mode: 'image', path: `${path}/sword`, debug: false,
+        coordx: 180, coordy: 155, scale: 0.05, rect: {w: 5 , h: 7.5 , ox: -1, oy: 4, rotation: null },
+      }
+    ]
+    this.assets = assets;
+    
+
     // Load Map //
     game.load.image('DungeonTileset', `${path}/DungeonTileset.png`);
     game.load.image('WallTileset', `${path}/WallTileset.png`);
     game.load.tilemap('DungeonTilemap', `${path}/map.json`, null, Phaser.Tilemap.TILED_JSON);
-
-    // Load Charachters //
-    game.load.atlasJSONHash('player', `${path}/player.png`, `${path}/player.json`);
-    //game.load.atlasJSONHash('goblin', './src/assets/goblin.png', './src/assets/goblin.json');
-    game.load.image('goblin', `${path}/goblin.png`);
-    game.load.image('potion', `${path}/potion.png`);
-    game.load.image('sword', `${path}/sword.png`);
+      
+    assets.forEach( asset =>{
+      let { name, type, mode, path } = asset;
+      // Load Charachters //
+      if (mode == 'atlas')
+        game.load.atlasJSONHash(name, `${path}.png`,  `${path}.json`)
+      if (mode == 'image')
+        game.load.image(name, `${path}.png`);
+    })
     
   }
 
    attack(body, enemy){
-        
+    enemy.sprite.animations.play('hit');
+    setTimeout(()=>{
+      enemy.sprite.animations.play('idle')
+    }, 700  )
     this.setState({movement: false, health: this.state.health -10});
     setTimeout(()=>{
       this.setState({movement: true})
@@ -60,25 +87,24 @@ class App extends Component{
   }
 
   health(body, potion){
+    body.velocity.x = 0;
+    body.velocity.y = 0;
     potion.sprite.kill();
     this.setState({health: this.state.health + 10});
     console.log(this.state.health)
   }
 
   dmg(body, weapon){
+    body.velocity.x = 0;
+    body.velocity.y = 0;
     weapon.sprite.kill();
     this.setState({attack: this.state.dmg + 10});
     console.log(this.state.dmg);
   }
 
- 
   
   create(){
-    let fps = 12;
-    let { game } = this;
-    let cursors = game.input.keyboard.createCursorKeys();
-
-    //  Helper Functions //
+    let { game, assets } = this;
  
     // Config Layer, Map and Stage //
     game.stage.backgroundColor = '#2d2d2d';
@@ -91,131 +117,109 @@ class App extends Component{
     let floorDetails = map.createLayer('floordetails');
     let foreground = map.createLayer('foreground');
     let foregroundDetails = map.createLayer('foregrounddetails');
-    
     let wallCollisions = game.add.tilemap('DungeonTilemap')
+  
+    // Enable Physics //
+    game.physics.startSystem(Phaser.Physics.P2JS);
+    game.physics.p2.setImpactEvents(true);
+    game.physics.p2.restitution = this.state.restitution;
 
-    // Add Charachters to Between Layers //
-    let player = game.add.sprite(160, 155, 'player', 'idle/0.png');
-    let goblin = game.add.sprite(180, 155, 'goblin');
-    let potion = game.add.sprite(180, 190, 'potion');
-    let sword = game.add.sprite(180, 210, 'sword');
+    // Add Charachters Between Layers //
+    assets = assets.map(asset => {
+
+      let {coordx, coordy, name } = asset;
+      console.log(coordx, coordy, name)
+      let sprite = game.add.sprite(coordx, coordy, name);
+      game.physics.p2.enable(sprite);
+      sprite.scale.setTo(asset.scale, asset.scale)
+      sprite.anchor.setTo(.5,.5);
+      
+      let { body, animations } = sprite;
+
+      // Charachter Body Config
+      body.fixedRotation = true; // no rotation
+      body.collideWorldBounds = true;
+      body.clearShapes(); 
+      body.damping = 0.99;
+      body.addRectangle(asset.rect.w, asset.rect.h, asset.rect.ox, asset.rect.oy)
+      body.debug = true;
+      
+      //Add Animations
+      if(asset.anim){
+        asset.anim.forEach( anim => {
+          animations.add( anim.name, Phaser.Animation.generateFrameNames( `${anim.name}/tile`, 0, anim.count, '.png', 3), anim.fps, true, false);
+        });
+      }
+      asset.variable = sprite;
+      return asset;
+    })
+
+
+    let char = assets[0].variable;
+    let potion = assets[1].variable;
+    let sword = assets[2].variable; 
 
     let foregroundTops = map.createLayer('foregroundtops');
     background.resizeWorld();
 
-    // Physics //
-    game.physics.startSystem(Phaser.Physics.P2JS);
-    game.physics.p2.setImpactEvents(true);
-    game.physics.p2.restitution = this.state.restitution;
+    // Physics Collisions //
+
     map.setCollisionBetween(1, 999, true, "foreground");
     map.setCollisionBetween(1, 999, true, "foregrounddetails");
     map.setCollisionBetween(1, 999, true, "backgrounddetails")
     let foregroundTiles = game.physics.p2.convertTilemap(map, "foreground");
     let foregroundDetailsTiles = game.physics.p2.convertTilemap(map, "foregrounddetails");
     let backgrounDetailsTiles = game.physics.p2.convertTilemap(map, "backgrounddetails");
-    
     let physicsTiles = [...foregroundTiles, ...foregroundDetailsTiles, ...backgrounDetailsTiles]
 
     // Set Collision Groups // 
-    let playerCG = game.physics.p2.createCollisionGroup();
-    let goblinCG = game.physics.p2.createCollisionGroup();
+    let charCG = game.physics.p2.createCollisionGroup();
+    let otherCG = game.physics.p2.createCollisionGroup();
     let wallsCG = game.physics.p2.createCollisionGroup();
-    let itemCG = game.physics.p2.createCollisionGroup();
-
-    
-    // Enable Physics per Charachter //
-    game.physics.p2.enable(player);
-    game.physics.p2.enable(goblin);
-    game.physics.p2.enable(potion);
-    game.physics.p2.enable(sword);
 
 
-    // Add Animations per Charachter //
-    player.animations.add('right', Phaser.Animation.generateFrameNames('right/', 0, 5, '.png', 1), fps, true, false);
-    player.animations.add('left', Phaser.Animation.generateFrameNames('left/', 0, 5, '.png', 1), fps, true, false);
-    player.animations.add('up', Phaser.Animation.generateFrameNames('up/', 0, 3, '.png', 1), fps, true, false);
-    player.animations.add('down', Phaser.Animation.generateFrameNames('down/', 0, 3, '.png', 1), fps, true, false);
-    player.animations.add('idle', Phaser.Animation.generateFrameNames('idle/', 0, 2, '.png', 1), fps-6, true, false);
-    
-    // Charachter Body Config
-    player.body.fixedRotation = true; // no rotation
-    player.body.collideWorldBounds = true;
-    player.body.clearShapes(); 
-    player.body.damping = 0.99;
-    player.scale.setTo(0.5, 0.5)
-    //player.anchor.setTo(.5,.5);
-    player.body.addRectangle(15, 7.5, -1, 4)
-    //player.body.debug = true;
-
-
-    goblin.body.fixedRotation = true; // no rotation
-    goblin.body.collideWorldBounds = true;
-    goblin.body.clearShapes();
-    goblin.scale.setTo(0.05, 0.05)
-    goblin.anchor.setTo(.5,.5);
-    goblin.body.addRectangle(15, 7.5, -1, 4)
-
-
-    potion.body.fixedRotation = true; // no rotation
-    potion.body.collideWorldBounds = true;
-    potion.body.clearShapes();
-    potion.scale.setTo(0.05, 0.05)
-    potion.anchor.setTo(.5,.5);
-    potion.body.addRectangle(15, 7.5, -1, 4)
-    
-
-    sword.body.fixedRotation = true; // no rotation
-    sword.body.collideWorldBounds = true;
-    sword.body.clearShapes();
-    sword.scale.setTo(0.05, 0.05)
-    sword.anchor.setTo(.5,.5);
-    sword.body.addRectangle(15, 7.5, -1, 4)
 
 
     // Set Collision Interaction //
     physicsTiles.forEach(tile=>{
       tile.setCollisionGroup(wallsCG);
-      tile.collides(playerCG);
-      tile.collides(goblinCG);
-      //player.body.createBodyCallback(tile, this.wallColl, this)
+      tile.collides(charCG);
+      tile.collides(otherCG);
     }) 
 
-    player.body.setCollisionGroup(playerCG);
-    goblin.body.setCollisionGroup(goblinCG);
-    potion.body.setCollisionGroup(itemCG);
-    sword.body.setCollisionGroup(itemCG);
-    player.body.collides(goblinCG);
-    player.body.collides(wallsCG);
-    player.body.collides(itemCG)
-    goblin.body.collides(playerCG);
-    potion.body.collides(playerCG);
-    sword.body.collides(playerCG);
+
+    char.body.setCollisionGroup(charCG);
+    potion.body.setCollisionGroup(otherCG);
+    sword.body.setCollisionGroup(otherCG);
+    char.body.collides(otherCG);
+    char.body.collides(wallsCG);
+    char.body.collides(otherCG)
+
+    potion.body.collides(charCG);
+    sword.body.collides(charCG);
 
     //bodies
     potion.body.static = true;
-    //item collissiong group
-    //player.body.collides(itemCG, collect, this);
-    player.body.createBodyCallback(goblin, this.attack, this)
-    player.body.createBodyCallback(potion, this.health, this)
-    player.body.createBodyCallback(sword, this.dmg, this)
-    
 
-    //  Export to class //
-    this.player = player;
-    this.cursors  = cursors;
+    //item collission group
+    //char.body.collides(itemCG, collect, this);
+  
+    char.body.createBodyCallback(potion, this.health, this)
+    char.body.createBodyCallback(sword, this.dmg, this)
+
+
+  //  Export to class //
+    this.char = char;
+    this.cursors = game.input.keyboard.createCursorKeys();
     this.map = map;
     this.foreground = foreground;
-    this.goblin = goblin;
 
   }
 
   update(){
-
     let speed = 80;
-    let { player: { body }  } = this;
-    let goblinBody = this.goblin.body;
-    goblinBody.static = true;
-    let { cursors, game, player, foreground } = this;
+    let { char: { body }  } = this;
+    let { cursors, game, char, foreground } = this;
     
     //goblinBody.setZeroVelocity();
     
@@ -223,20 +227,19 @@ class App extends Component{
       body.velocity.y = 0;
       body.velocity.x = 0;
       if (cursors.left.isDown){
-
         body.moveLeft(speed);
-        player.animations.play('left');
-      }  else if(cursors.right.isDown){
+        char.animations.play('left');
+      } else if(cursors.right.isDown){
         body.moveRight(speed);
-        player.animations.play('right');
+        char.animations.play('right');
       } if (cursors.up.isDown){
         body.moveUp(speed);
-        player.animations.play('up');
-      }  else if(cursors.down.isDown){
+        char.animations.play('up');
+      } else if(cursors.down.isDown){
         body.moveDown(speed);
-        player.animations.play('down');
+       char.animations.play('down');
       } else if (cursors.down.isUp && cursors.up.isUp && cursors.left.isUp && cursors.right.isUp){
-          player.animations.play('idle');
+        char.animations.play('idle');
       }
     }
     
@@ -244,20 +247,20 @@ class App extends Component{
 
   render(){
     return(
-        <div></div>
+
+        <div>
+          <StatusBar props={this.state}/>
+        </div>
     )
   }
-
 }
-
-
   
 
 
 
 ReactDOM.render(
   <div>
-     <App />
+     <PhaserGame />
   </div>
 
   , document.querySelector('.container'));
