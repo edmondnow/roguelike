@@ -21,6 +21,7 @@ class PhaserGame extends Component{
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.preload = this.preload.bind(this);
+    this.assetGenerator = this.assetGenerator.bind(this);
   }
 
   componentDidMount(){
@@ -48,6 +49,11 @@ class PhaserGame extends Component{
           { name: 'idle' , count: 2 , fps: 3 }
         ]
        },
+      /*{ name: 'skel', variable: null, type: 'npc', mode: 'atlas', path: `${path}/skel/skel`, debug: true,
+        coordx: 170, coordy: 160, scale: 1, rect: { w: 15, h: 7.5, ox: -1, oy: 4, rotation: null }, anim: [
+          write animations here
+        ]
+      */
       { name: 'potion', variable: null, type: 'item', mode: 'image', path: `${path}/potion`, debug: true,
         coordx: 190, coordy: 155, scale: 0.05, rect: {w: 7 , h: 7.5 , ox: -1, oy: 4, rotation: null }
       },
@@ -102,34 +108,15 @@ class PhaserGame extends Component{
     console.log(this.state.dmg);
   }
 
-  
-  create(){
-    let { game, assets } = this;
- 
-    // Config Layer, Map and Stage //
-    game.stage.backgroundColor = '#2d2d2d';
-    let map = game.add.tilemap('DungeonTilemap');
-    map.addTilesetImage('DungeonTileset', 'DungeonTileset');
-    map.addTilesetImage('WallTileset', 'WallTileset');
-    let background = map.createLayer('background');
-    let backgroundDetails = map.createLayer('backgrounddetails');
-    let floor = map.createLayer('floor'); 
-    let floorDetails = map.createLayer('floordetails');
-    let foreground = map.createLayer('foreground');
-    let foregroundDetails = map.createLayer('foregrounddetails');
-    let wallCollisions = game.add.tilemap('DungeonTilemap')
-  
-    // Enable Physics //
-    game.physics.startSystem(Phaser.Physics.P2JS);
-    game.physics.p2.setImpactEvents(true);
-    game.physics.p2.restitution = this.state.restitution;
+      
+  assetGenerator(assets, game, charCG, otherCG, wallsCG){
+    let charBody;
 
-    // Add Charachters Between Layers //
-    assets = assets.map(asset => {
-
+    return assets.map(asset => {
+      
       let {coordx, coordy, name } = asset;
-      console.log(coordx, coordy, name)
       let sprite = game.add.sprite(coordx, coordy, name);
+      asset.variable = sprite;
       game.physics.p2.enable(sprite);
       sprite.scale.setTo(asset.scale, asset.scale)
       sprite.anchor.setTo(.5,.5);
@@ -142,86 +129,103 @@ class PhaserGame extends Component{
       body.clearShapes(); 
       body.damping = 0.99;
       body.addRectangle(asset.rect.w, asset.rect.h, asset.rect.ox, asset.rect.oy)
-      body.debug = true;
+      body.debug = asset.debug;
       
       //Add Animations
       if(asset.anim){
         asset.anim.forEach( anim => {
-          animations.add( anim.name, Phaser.Animation.generateFrameNames( `${anim.name}/tile`, 0, anim.count, '.png', 3), anim.fps, true, false);
+          animations.add( 
+            anim.name, 
+            Phaser.Animation.generateFrameNames( `${anim.name}/tile`, 0, anim.count, '.png', 3), 
+            anim.fps,
+            true,
+            false
+          );
         });
       }
-      asset.variable = sprite;
+      
+
+      if(asset.name == 'char'){
+        charBody = body;
+        charBody.setCollisionGroup(charCG);
+        charBody.collides(otherCG);
+        charBody.collides(wallsCG);
+      } else {
+        body.setCollisionGroup(otherCG);
+        body.collides(charCG);
+        if(asset.name == 'potion')
+          body.createBodyCallback(asset.variable, this.health,this)
+        if(asset.name == 'sword')
+          body.createBodyCallback(asset.variable, this.dmg, this)
+      }
+      
       return asset;
     })
 
+  }
+  
+  create(){
+    let { game, assets } = this;
+    let wallCollisions = game.add.tilemap('DungeonTilemap')
+    let physicsTiles = [];
 
-    let char = assets[0].variable;
-    let potion = assets[1].variable;
-    let sword = assets[2].variable; 
-
-    let foregroundTops = map.createLayer('foregroundtops');
-    background.resizeWorld();
-
-    // Physics Collisions //
-
-    map.setCollisionBetween(1, 999, true, "foreground");
-    map.setCollisionBetween(1, 999, true, "foregrounddetails");
-    map.setCollisionBetween(1, 999, true, "backgrounddetails")
-    let foregroundTiles = game.physics.p2.convertTilemap(map, "foreground");
-    let foregroundDetailsTiles = game.physics.p2.convertTilemap(map, "foregrounddetails");
-    let backgrounDetailsTiles = game.physics.p2.convertTilemap(map, "backgrounddetails");
-    let physicsTiles = [...foregroundTiles, ...foregroundDetailsTiles, ...backgrounDetailsTiles]
+    let layers = [ 
+      { name: 'background', collision: false, variable: null }, 
+      { name: 'backgrounddetails', collision: true, variable: null  },
+      { name: 'floor', collision: false, variable: null  },
+      { name: 'floordetails', collision: false, variable: null  },
+      { name: 'foreground', collision: true, variable: null  },
+      { name: 'foregrounddetails', collision: true, variable: null  },
+      { name: 'foregroundtops', collision: false, variable: null  }
+    ];
+ 
+    // Config Layer, Map and Stage //
+    game.stage.backgroundColor = '#2d2d2d';
+    let map = game.add.tilemap('DungeonTilemap');
+    map.addTilesetImage('DungeonTileset', 'DungeonTileset');
+    map.addTilesetImage('WallTileset', 'WallTileset');
+    
+    // Enable Physics //
+    game.physics.startSystem(Phaser.Physics.P2JS);
+    game.physics.p2.setImpactEvents(true);
+    game.physics.p2.restitution = this.state.restitution;
 
     // Set Collision Groups // 
     let charCG = game.physics.p2.createCollisionGroup();
     let otherCG = game.physics.p2.createCollisionGroup();
     let wallsCG = game.physics.p2.createCollisionGroup();
+    
+    //Layer Generation with Asset Generator embeded inbetween
+    layers = layers.map( layer => {
+      if(layer.name === 'foreground')
+          assets = this.assetGenerator(assets, game, charCG, otherCG, wallsCG);
+      layer.variable = map.createLayer(layer.name);
+      if(layer.collision){
+        map.setCollisionBetween(1, 999, true, layer.name);
+        let tiles = game.physics.p2.convertTilemap(map, layer.name);
+        tiles.forEach(tile=>{
+          tile.setCollisionGroup(wallsCG);
+          tile.collides(charCG);
+          tile.collides(otherCG);
+        }) 
+      }
 
-
-
-
-    // Set Collision Interaction //
-    physicsTiles.forEach(tile=>{
-      tile.setCollisionGroup(wallsCG);
-      tile.collides(charCG);
-      tile.collides(otherCG);
-    }) 
-
-
-    char.body.setCollisionGroup(charCG);
-    potion.body.setCollisionGroup(otherCG);
-    sword.body.setCollisionGroup(otherCG);
-    char.body.collides(otherCG);
-    char.body.collides(wallsCG);
-    char.body.collides(otherCG)
-
-    potion.body.collides(charCG);
-    sword.body.collides(charCG);
-
-    //bodies
-    potion.body.static = true;
-
-    //item collission group
-    //char.body.collides(itemCG, collect, this);
-  
-    char.body.createBodyCallback(potion, this.health, this)
-    char.body.createBodyCallback(sword, this.dmg, this)
+      return layer
+    });
+    
 
 
   //  Export to class //
-    this.char = char;
+    this.char = assets[0].variable;
     this.cursors = game.input.keyboard.createCursorKeys();
     this.map = map;
-    this.foreground = foreground;
 
   }
 
   update(){
     let speed = 80;
     let { char: { body }  } = this;
-    let { cursors, game, char, foreground } = this;
-    
-    //goblinBody.setZeroVelocity();
+    let { cursors, game, char } = this;
     
     if(this.state.movement){
       body.velocity.y = 0;
@@ -255,12 +259,14 @@ class PhaserGame extends Component{
   }
 }
   
-
-
-
 ReactDOM.render(
   <div>
      <PhaserGame />
   </div>
 
   , document.querySelector('.container'));
+
+
+//things I commented out  
+  //goblinBody.setZeroVelocity();
+  //char.body.collides(itemCG, collect, this)
