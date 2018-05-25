@@ -22,6 +22,9 @@ class PhaserGame extends Component{
     this.update = this.update.bind(this);
     this.preload = this.preload.bind(this);
     this.assetGenerator = this.assetGenerator.bind(this);
+    this.dmg = this.dmg.bind(this);
+    this.health = this.health.bind(this);
+    this.attack = this.attack.bind(this);
   }
 
   componentDidMount(){
@@ -32,6 +35,92 @@ class PhaserGame extends Component{
           preload: this.preload
         }
    );
+  }
+
+   attack(body, enemy){
+    enemy.sprite.animations.play('hit');
+    setTimeout( ()=>{
+      enemy.sprite.animations.play('idle')
+    }, 700  )
+    this.setState({ movement: false, health: this.state.health -10 });
+    setTimeout( ()=>{
+      this.setState({ movement: true })
+    }, 500)
+      console.log(this.state.health)
+  }
+
+  health(body, potion){
+    console.log('click')
+    body.velocity.x = 0;
+    body.velocity.y = 0;
+    potion.sprite.kill();
+    this.setState({health: this.state.health + 10});
+    console.log(this.state.health)
+  }
+
+  dmg(body, weapon){
+    body.velocity.x = 0;
+    body.velocity.y = 0;
+    weapon.sprite.kill();
+    this.setState({attack: this.state.dmg + 10});
+    console.log(this.state.dmg);
+  }
+
+      
+  assetGenerator(assets, game, charCG, otherCG, wallsCG, health, dmg){
+    let charBody;
+
+    return assets.map(asset => {
+      
+      let {coordx, coordy, name } = asset;
+      let sprite = game.add.sprite(coordx, coordy, name);
+      asset.variable = sprite;
+      game.physics.p2.enable(sprite);
+      sprite.scale.setTo(asset.scale, asset.scale)
+      sprite.anchor.setTo(.5,.5);
+      
+      let { body, animations } = sprite;
+
+      // Charachter Body Config
+      body.fixedRotation = true; // no rotation
+      body.collideWorldBounds = true;
+      body.clearShapes(); 
+      body.damping = 0.99;
+      body.addRectangle(asset.rect.w, asset.rect.h, asset.rect.ox, asset.rect.oy)
+      body.debug = asset.debug;
+      
+      //Add Animations
+      if(asset.anim){
+        asset.anim.forEach( anim => {
+          animations.add( 
+            anim.name, 
+            Phaser.Animation.generateFrameNames( `${anim.name}/tile`, 0, anim.count, '.png', 3), 
+            anim.fps,
+            true,
+            false
+          );
+        });
+      }
+      
+
+      if(asset.name == 'char'){
+        charBody = body;
+        charBody.setCollisionGroup(charCG);
+        charBody.collides(otherCG);
+        charBody.collides(wallsCG);
+      } else {
+        body.setCollisionGroup(otherCG);
+        body.collides(charCG);
+        body.static = true;
+        if(asset.name == 'potion')
+          charBody.createBodyCallback(sprite, this.health, this)
+        if(asset.name == 'sword')
+          charBody.createBodyCallback(sprite, this.dmg, this)
+      }
+      
+      return asset;
+    })
+
   }
 
   preload(){
@@ -80,90 +169,6 @@ class PhaserGame extends Component{
     
   }
 
-   attack(body, enemy){
-    enemy.sprite.animations.play('hit');
-    setTimeout(()=>{
-      enemy.sprite.animations.play('idle')
-    }, 700  )
-    this.setState({movement: false, health: this.state.health -10});
-    setTimeout(()=>{
-      this.setState({movement: true})
-    }, 500)
-      console.log(this.state.health)
-  }
-
-  health(body, potion){
-    body.velocity.x = 0;
-    body.velocity.y = 0;
-    potion.sprite.kill();
-    this.setState({health: this.state.health + 10});
-    console.log(this.state.health)
-  }
-
-  dmg(body, weapon){
-    body.velocity.x = 0;
-    body.velocity.y = 0;
-    weapon.sprite.kill();
-    this.setState({attack: this.state.dmg + 10});
-    console.log(this.state.dmg);
-  }
-
-      
-  assetGenerator(assets, game, charCG, otherCG, wallsCG){
-    let charBody;
-
-    return assets.map(asset => {
-      
-      let {coordx, coordy, name } = asset;
-      let sprite = game.add.sprite(coordx, coordy, name);
-      asset.variable = sprite;
-      game.physics.p2.enable(sprite);
-      sprite.scale.setTo(asset.scale, asset.scale)
-      sprite.anchor.setTo(.5,.5);
-      
-      let { body, animations } = sprite;
-
-      // Charachter Body Config
-      body.fixedRotation = true; // no rotation
-      body.collideWorldBounds = true;
-      body.clearShapes(); 
-      body.damping = 0.99;
-      body.addRectangle(asset.rect.w, asset.rect.h, asset.rect.ox, asset.rect.oy)
-      body.debug = asset.debug;
-      
-      //Add Animations
-      if(asset.anim){
-        asset.anim.forEach( anim => {
-          animations.add( 
-            anim.name, 
-            Phaser.Animation.generateFrameNames( `${anim.name}/tile`, 0, anim.count, '.png', 3), 
-            anim.fps,
-            true,
-            false
-          );
-        });
-      }
-      
-
-      if(asset.name == 'char'){
-        charBody = body;
-        charBody.setCollisionGroup(charCG);
-        charBody.collides(otherCG);
-        charBody.collides(wallsCG);
-      } else {
-        body.setCollisionGroup(otherCG);
-        body.collides(charCG);
-        if(asset.name == 'potion')
-          body.createBodyCallback(asset.variable, this.health,this)
-        if(asset.name == 'sword')
-          body.createBodyCallback(asset.variable, this.dmg, this)
-      }
-      
-      return asset;
-    })
-
-  }
-  
   create(){
     let { game, assets } = this;
     let wallCollisions = game.add.tilemap('DungeonTilemap')
@@ -195,11 +200,11 @@ class PhaserGame extends Component{
     let otherCG = game.physics.p2.createCollisionGroup();
     let wallsCG = game.physics.p2.createCollisionGroup();
     
-    //Layer Generation with Asset Generator embeded inbetween
+    //Layer Generation with Asset Generator embedded
     layers = layers.map( layer => {
-      if(layer.name === 'foreground')
-          assets = this.assetGenerator(assets, game, charCG, otherCG, wallsCG);
       layer.variable = map.createLayer(layer.name);
+      if(layer.name === 'foregrounddetails')
+        assets = this.assetGenerator(assets, game, charCG, otherCG, wallsCG, this.health, this.dmg);
       if(layer.collision){
         map.setCollisionBetween(1, 999, true, layer.name);
         let tiles = game.physics.p2.convertTilemap(map, layer.name);
@@ -209,7 +214,6 @@ class PhaserGame extends Component{
           tile.collides(otherCG);
         }) 
       }
-
       return layer
     });
     
@@ -223,7 +227,7 @@ class PhaserGame extends Component{
   }
 
   update(){
-    let speed = 80;
+    let speed = 100;
     let { char: { body }  } = this;
     let { cursors, game, char } = this;
     
