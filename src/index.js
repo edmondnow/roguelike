@@ -21,7 +21,7 @@ class PhaserGame extends Component{
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.preload = this.preload.bind(this);
-    this.assetGenerator = this.assetGenerator.bind(this);
+    this.generateAsset = this.generateAsset.bind(this);
     this.dmg = this.dmg.bind(this);
     this.health = this.health.bind(this);
     this.attack = this.attack.bind(this);
@@ -38,9 +38,12 @@ class PhaserGame extends Component{
   }
 
    attack(body, enemy){
+    console.log(enemy)
     enemy.sprite.animations.play('hit');
+    enemy.sprite.animations.play('hitleft');
     setTimeout( ()=>{
       enemy.sprite.animations.play('idle')
+      enemy.sprite.animations.play('idleleft')
     }, 700  )
     this.setState({ movement: false, health: this.state.health -10 });
     setTimeout( ()=>{
@@ -50,7 +53,6 @@ class PhaserGame extends Component{
   }
 
   health(body, potion){
-    console.log('click')
     body.velocity.x = 0;
     body.velocity.y = 0;
     potion.sprite.kill();
@@ -67,7 +69,7 @@ class PhaserGame extends Component{
   }
 
       
-  assetGenerator(assets, game, charCG, otherCG, wallsCG, health, dmg){
+  generateAsset(assets, game, charCG, otherCG, wallsCG){
     let charBody;
 
     return assets.map(asset => {
@@ -101,7 +103,6 @@ class PhaserGame extends Component{
           );
         });
       }
-      
 
       if(asset.name == 'char'){
         charBody = body;
@@ -112,10 +113,15 @@ class PhaserGame extends Component{
         body.setCollisionGroup(otherCG);
         body.collides(charCG);
         body.static = true;
-        if(asset.name == 'potion')
+        if(asset.name === 'potion')
           charBody.createBodyCallback(sprite, this.health, this)
-        if(asset.name == 'sword')
+        if(asset.name === 'sword')
           charBody.createBodyCallback(sprite, this.dmg, this)
+        if(asset.type == 'monster'){
+          sprite.animations.play('idle')
+          sprite.animations.play('idleleft')
+          charBody.createBodyCallback(sprite, this.attack, this)
+        }
       }
       
       return asset;
@@ -138,12 +144,55 @@ class PhaserGame extends Component{
           { name: 'idle' , count: 2 , fps: 3 }
         ]
        },
-      /*{ name: 'skel', variable: null, type: 'npc', mode: 'atlas', path: `${path}/skel/skel`, debug: true,
-        coordx: 170, coordy: 160, scale: 1, rect: { w: 15, h: 7.5, ox: -1, oy: 4, rotation: null }, anim: [
-          write animations here
+       { name: 'skel', variable: null, type: 'monster', mode: 'atlas', path: `${path}/skeleton/skeleton`, debug: false,
+        coordx: 180, coordy: 190, scale: 0.8, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
+          { name: 'attackright' , count: 18 , fps: 9 },
+          { name: 'dead', count: 15, fps: 9 },
+          { name: 'hitleft', count: 8, fps: 10 },
+          { name: 'hitright', count: 8, fps: 9 },
+          { name: 'idleleft', count: 11, fps: 6 },
+          { name: 'idleright', count: 11, fps: 6 },
+          { name: 'reactleft', count: 4, fps: 9 },
+          { name: 'reactright', count: 4, fps: 9 },
+          { name: 'walkleft', count: 13, fps: 9 },
+          { name: 'walkright', count: 13, fps: 9 }
         ]
-      */
-      { name: 'potion', variable: null, type: 'item', mode: 'image', path: `${path}/potion`, debug: true,
+       },
+       { name: 'gob', variable: null, type: 'monster', mode: 'atlas', path: `${path}/goblin/goblin`, debug: false,
+        coordx: 200, coordy: 190, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
+          { name: 'attackright' , count: 7 , fps: 9 },
+          { name: 'attackleft' , count: 7 , fps: 9 },
+          { name: 'dead', count: 8 , fps: 9 },
+          { name: 'hit', count: 3, fps: 5 },
+          { name: 'idle', count: 3, fps: 3.5 },
+          { name: 'left', count: 6, fps: 6 },
+          { name: 'right', count: 6, fps: 6 },
+        ]
+       },
+       { name: 'wiz', variable: null, type: 'monster', mode: 'atlas', path: `${path}/wizard/wizard`, debug: false,
+        coordx: 225, coordy: 190, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
+          { name: 'attackright', count: 8 , fps: 9 },
+          { name: 'attackleft' , count: 8 , fps: 9 },
+          { name: 'dead', count: 10 , fps: 9 },
+          { name: 'hit', count: 10, fps: 5 },
+          { name: 'idle', count: 10, fps: 3 },
+          { name: 'left', count: 6, fps: 6 },
+          { name: 'right', count: 6, fps: 6 },
+        ]
+       },
+       { name: 'hound', variable: null, type: 'monster', mode: 'atlas', path: `${path}/hound/hound`, debug: false,
+        coordx: 260, coordy: 180, scale: 0.7, rect: {w: 20 , h: 10 , ox: 0, oy: 7, rotation: null }, anim: [
+          { name: 'attackleft', count: 6 , fps: 9 },
+          { name: 'hitleft' , count: 3 , fps: 5 },
+          { name: 'hitright', count: 3 , fps: 5 },
+          { name: 'idleleft', count: 6, fps: 4 },
+          { name: 'idleright', count: 6, fps: 3 },
+          { name: 'walkleft', count: 12, fps: 6 },
+          { name: 'walkright', count: 12, fps: 6 },
+
+        ]
+       },
+      { name: 'potion', variable: null, type: 'item', mode: 'image', path: `${path}/potion`, debug: false,
         coordx: 190, coordy: 155, scale: 0.05, rect: {w: 7 , h: 7.5 , ox: -1, oy: 4, rotation: null }
       },
       { name: 'sword', variable: null, type: 'item', mode: 'image', path: `${path}/sword`, debug: false,
@@ -204,7 +253,7 @@ class PhaserGame extends Component{
     layers = layers.map( layer => {
       layer.variable = map.createLayer(layer.name);
       if(layer.name === 'foregrounddetails')
-        assets = this.assetGenerator(assets, game, charCG, otherCG, wallsCG, this.health, this.dmg);
+        assets = this.generateAsset(assets, game, charCG, otherCG, wallsCG);
       if(layer.collision){
         map.setCollisionBetween(1, 999, true, layer.name);
         let tiles = game.physics.p2.convertTilemap(map, layer.name);
@@ -227,7 +276,7 @@ class PhaserGame extends Component{
   }
 
   update(){
-    let speed = 100;
+    let speed = 80 ;
     let { char: { body }  } = this;
     let { cursors, game, char } = this;
     

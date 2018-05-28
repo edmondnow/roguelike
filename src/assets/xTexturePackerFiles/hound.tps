@@ -204,15 +204,9 @@
             <key type="filename">../hound/hitleft/tile000.png</key>
             <key type="filename">../hound/hitleft/tile001.png</key>
             <key type="filename">../hound/hitleft/tile002.png</key>
-            <key type="filename">../hound/hitleft/tile003.png</key>
-            <key type="filename">../hound/hitleft/tile004.png</key>
-            <key type="filename">../hound/hitleft/tile005.png</key>
             <key type="filename">../hound/hitright/tile000.png</key>
             <key type="filename">../hound/hitright/tile001.png</key>
-            <key type="filename">../hound/hitright/tile002.png</key>
             <key type="filename">../hound/hitright/tile003.png</key>
-            <key type="filename">../hound/hitright/tile004.png</key>
-            <key type="filename">../hound/hitright/tile005.png</key>
             <key type="filename">../hound/idleleft/tile000.png</key>
             <key type="filename">../hound/idleleft/tile001.png</key>
             <key type="filename">../hound/idleleft/tile002.png</key>
@@ -271,23 +265,6 @@
                 <rect>389,31,777,62</rect>
                 <key>scale9Paddings</key>
                 <rect>389,31,777,62</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">../hound/runleft/tile000.png</key>
-            <key type="filename">../hound/runleft/tile001.png</key>
-            <key type="filename">../hound/runleft/tile002.png</key>
-            <key type="filename">../hound/runleft/tile003.png</key>
-            <key type="filename">../hound/runleft/tile004.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>17,8,33,16</rect>
-                <key>scale9Paddings</key>
-                <rect>17,8,33,16</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

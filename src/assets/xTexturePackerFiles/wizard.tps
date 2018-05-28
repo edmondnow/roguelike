@@ -134,7 +134,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../skeleton/wizard.json</filename>
+                <filename>../wizard/wizard.json</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -212,13 +212,6 @@
             <key type="filename">../wizard/hit/tile000.png</key>
             <key type="filename">../wizard/hit/tile001.png</key>
             <key type="filename">../wizard/hit/tile002.png</key>
-            <key type="filename">../wizard/hit/tile003.png</key>
-            <key type="filename">../wizard/hit/tile004.png</key>
-            <key type="filename">../wizard/hit/tile005.png</key>
-            <key type="filename">../wizard/hit/tile006.png</key>
-            <key type="filename">../wizard/hit/tile007.png</key>
-            <key type="filename">../wizard/hit/tile008.png</key>
-            <key type="filename">../wizard/hit/tile009.png</key>
             <key type="filename">../wizard/idle/tile000.png</key>
             <key type="filename">../wizard/idle/tile001.png</key>
             <key type="filename">../wizard/idle/tile002.png</key>
