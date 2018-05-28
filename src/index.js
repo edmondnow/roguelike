@@ -133,9 +133,7 @@ class PhaserGame extends Component{
     let { game } = this;
     let path = './src/assets';
 
-    //Specify all assets in an object to iterate over
-    let assets = [
-      { name: 'char', variable: null, type: 'player', mode: 'atlas', path: `${path}/char/char`, debug: false,
+    let char =  { name: 'char', variable: null, type: 'player', mode: 'atlas', quant:  1, path: `${path}/char/char`, debug: false,
         coordx: 160, coordy: 155, scale: 0.5, rect: {w: 15 , h: 7.5 , ox: -1, oy: 4, rotation: null }, anim: [
           { name: 'right' , count: 5 , fps: 9 },
           { name: 'left' , count: 5 , fps: 9 },
@@ -143,9 +141,10 @@ class PhaserGame extends Component{
           { name: 'down' , count: 3 , fps: 9 },
           { name: 'idle' , count: 2 , fps: 3 }
         ]
-       },
-       { name: 'skel', variable: null, type: 'monster', mode: 'atlas', path: `${path}/skeleton/skeleton`, debug: false,
-        coordx: 180, coordy: 190, scale: 0.8, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
+       }
+
+    let skel =   { name: 'skel', variable: null, type: 'monster', mode: 'atlas', quant:  5, path: `${path}/skeleton/skeleton`, debug: false,
+        coordx: 180, coordy: 190, scale: 0.9, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 18 , fps: 9 },
           { name: 'dead', count: 15, fps: 9 },
           { name: 'hitleft', count: 8, fps: 10 },
@@ -157,8 +156,9 @@ class PhaserGame extends Component{
           { name: 'walkleft', count: 13, fps: 9 },
           { name: 'walkright', count: 13, fps: 9 }
         ]
-       },
-       { name: 'gob', variable: null, type: 'monster', mode: 'atlas', path: `${path}/goblin/goblin`, debug: false,
+      }
+
+    let gob =  { name: 'gob', variable: null, type: 'monster', mode: 'atlas', quant: 10, path: `${path}/goblin/goblin`, debug: false,
         coordx: 200, coordy: 190, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 7 , fps: 9 },
           { name: 'attackleft' , count: 7 , fps: 9 },
@@ -168,8 +168,9 @@ class PhaserGame extends Component{
           { name: 'left', count: 6, fps: 6 },
           { name: 'right', count: 6, fps: 6 },
         ]
-       },
-       { name: 'wiz', variable: null, type: 'monster', mode: 'atlas', path: `${path}/wizard/wizard`, debug: false,
+       }
+    
+    let wiz =  { name: 'wiz', variable: null, type: 'monster', mode: 'atlas', quant:  3, path: `${path}/wizard/wizard`, debug: false,
         coordx: 225, coordy: 190, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright', count: 8 , fps: 9 },
           { name: 'attackleft' , count: 8 , fps: 9 },
@@ -179,8 +180,9 @@ class PhaserGame extends Component{
           { name: 'left', count: 6, fps: 6 },
           { name: 'right', count: 6, fps: 6 },
         ]
-       },
-       { name: 'hound', variable: null, type: 'monster', mode: 'atlas', path: `${path}/hound/hound`, debug: false,
+       }
+
+    let hound =  { name: 'hound', variable: null, type: 'monster', mode: 'atlas', quant: 5, path: `${path}/hound/hound`, debug: false,
         coordx: 260, coordy: 180, scale: 0.7, rect: {w: 20 , h: 10 , ox: 0, oy: 7, rotation: null }, anim: [
           { name: 'attackleft', count: 6 , fps: 9 },
           { name: 'hitleft' , count: 3 , fps: 5 },
@@ -191,14 +193,19 @@ class PhaserGame extends Component{
           { name: 'walkright', count: 12, fps: 6 },
 
         ]
-       },
-      { name: 'potion', variable: null, type: 'item', mode: 'image', path: `${path}/potion`, debug: false,
+       }
+
+    let potion = { name: 'potion', variable: null, type: 'item', mode: 'image', quant: 5, path: `${path}/potion`, debug: false,
         coordx: 190, coordy: 155, scale: 0.05, rect: {w: 7 , h: 7.5 , ox: -1, oy: 4, rotation: null }
-      },
-      { name: 'sword', variable: null, type: 'item', mode: 'image', path: `${path}/sword`, debug: false,
+      }
+    
+    let sword =  { name: 'sword', variable: null, type: 'item', mode: 'image', quant:  5, path: `${path}/sword`, debug: false,
         coordx: 180, coordy: 155, scale: 0.05, rect: {w: 5 , h: 7.5 , ox: -1, oy: 4, rotation: null },
       }
-    ]
+
+    //Specify all assets in an object to iterate over
+    let assets = [char, skel, gob, wiz, hound]
+   
     this.assets = assets;
     
 

@@ -5,11 +5,16 @@ const StatusBar = (props) => {
   
   return (
     <div>
-      <img src="./src/assets/bakerycraft.png" alt="bakerycraft" id="craft" />
       <div className="statusbar">
-        <img src="./src/assets/heart.png" alt="heart" id="heart"/>{health}
-        lvl: {lvl},
-        <img src={weapon} alt="heart" id="heart"/>{dmg}
+        <span class="gap">
+          <img src="./src/assets/char/avatar.png" alt="avatar" id="avatar"/> {lvl}/10
+        </span>
+        <span class="gap">
+          <img src="./src/assets/heart.png" alt="heart" id="heart"/>{health}/100
+        </span>
+        <span class="gap">
+          <img src={weapon} alt="sword" id="sword"/>{dmg}/60
+        </span>
       </div>
     </div>
   )
