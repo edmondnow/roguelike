@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import StatusBar from './components/statusbar';
+import DialogBox from './components/dialogbox';
 
 class PhaserGame extends Component{
   constructor(props){
@@ -204,7 +205,7 @@ class PhaserGame extends Component{
       }
 
     //Specify all assets in an object to iterate over
-    let assets = [char, skel, gob, wiz, hound]
+    let assets = [char, skel, gob, wiz, hound, potion, sword]
    
     this.assets = assets;
     
@@ -314,6 +315,8 @@ class PhaserGame extends Component{
 
         <div>
           <StatusBar props={this.state}/>
+          <div id="phaser-container"/>
+          <DialogBox />
         </div>
     )
   }
@@ -323,10 +326,4 @@ ReactDOM.render(
   <div>
      <PhaserGame />
   </div>
-
   , document.querySelector('.container'));
-
-
-//things I commented out  
-  //goblinBody.setZeroVelocity();
-  //char.body.collides(itemCG, collect, this)

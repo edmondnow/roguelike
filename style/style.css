@@ -1,10 +1,16 @@
+@font-face {
+  font-family: 'Visitor';
+  src: url('../src/assets/visitor1.ttf') format('truetype');
+}
+
+
 body {
   margin: 0;
   background-color: #1C1117;
 }
 
 .gap{
-  margin: 0 50px;
+  margin: 0 70px;
 }
 
 #heart{
@@ -23,20 +29,22 @@ body {
 }
 
 .statusbar{
-  width: 90%;
-  margin: 0 auto;
+  width: 50%;
+  margin: 20px auto 0 auto;
   margin-bottom: 20px;
   background-color: #1C1117;
-  height: 60px;
+  height: 30px;
   color: white;
   text-align: center;
-  font-family: 'Cutive Mono', monospace;
+  font-family: 'Visitor', Verdana, Tahoma;
   font-size: 1.1em;
-  padding-top: 20px;
+  padding: 5px 0px;
+  border: 2px solid rgb(102, 88, 64);
+  background-color: rgb(60, 40, 53);
 
 }
 
-#avatar{
+#charavatar{
   width: 25px;
   position: relative;
   top: 3px;
@@ -51,4 +59,43 @@ canvas {
   height: 100px;
   margin: 0 auto;
   margin-top: 20px;
+}
+
+
+.dialogbox {
+  height: 170px;
+  width: 50%;
+  margin: 0 auto;
+  padding: 10px;
+  color: white;
+  display: flex;
+  align-items: left;
+  border: 2px solid rgb(102, 88, 64);
+  background-color: rgb(60, 40, 53);
+}
+
+#avatar{
+  margin: 0;
+  height: 170px;
+  display: inline-block;
+
+}
+
+
+#title {
+  text-align: left;
+  margin-bottom: 10px;
+  font-size: 1.6em;
+}
+#text-box {
+  text-align: justify;
+  padding: 10px;
+  font-family: 'Visitor', Verdana, Tahoma;
+  font-size: 1.2em;
+  line-height: 1.2em;
+}
+
+
+.avatarDiv {
+  background-color: #5f021F;
 }
