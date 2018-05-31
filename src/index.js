@@ -144,8 +144,8 @@ class PhaserGame extends Component{
         ]
        }
 
-    let skel =   { name: 'skel', variable: null, type: 'monster', mode: 'atlas', quant:  5, path: `${path}/skeleton/skeleton`, debug: false,
-        coordx: 180, coordy: 190, scale: 0.9, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
+    let skel =   { name: 'skel', variable: null, type: 'monster', mode: 'atlas', quant:  5, dmg: 10, health: 30, path: `${path}/skeleton/skeleton`, debug: false,
+        coordx: null, coordy: null, scale: 0.9, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 18 , fps: 9 },
           { name: 'dead', count: 15, fps: 9 },
           { name: 'hitleft', count: 8, fps: 10 },
@@ -159,8 +159,8 @@ class PhaserGame extends Component{
         ]
       }
 
-    let gob =  { name: 'gob', variable: null, type: 'monster', mode: 'atlas', quant: 10, path: `${path}/goblin/goblin`, debug: false,
-        coordx: 200, coordy: 190, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
+    let gob =  { name: 'gob', variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 10, health: 30, path: `${path}/goblin/goblin`, debug: false,
+        coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 7 , fps: 9 },
           { name: 'attackleft' , count: 7 , fps: 9 },
           { name: 'dead', count: 8 , fps: 9 },
@@ -171,8 +171,8 @@ class PhaserGame extends Component{
         ]
        }
     
-    let wiz =  { name: 'wiz', variable: null, type: 'monster', mode: 'atlas', quant:  3, path: `${path}/wizard/wizard`, debug: false,
-        coordx: 225, coordy: 190, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
+    let wiz =  { name: 'wiz', variable: null, type: 'monster', mode: 'atlas', quant:  3, dmg: 10, health: 30, path: `${path}/wizard/wizard`, debug: false,
+        coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright', count: 8 , fps: 9 },
           { name: 'attackleft' , count: 8 , fps: 9 },
           { name: 'dead', count: 10 , fps: 9 },
@@ -183,8 +183,8 @@ class PhaserGame extends Component{
         ]
        }
 
-    let hound =  { name: 'hound', variable: null, type: 'monster', mode: 'atlas', quant: 5, path: `${path}/hound/hound`, debug: false,
-        coordx: 260, coordy: 180, scale: 0.7, rect: {w: 20 , h: 10 , ox: 0, oy: 7, rotation: null }, anim: [
+    let hound =  { name: 'hound', variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 10, health: 30, path: `${path}/hound/hound`, debug: false,
+        coordx: null, coordy: null, scale: 0.7, rect: {w: 20 , h: 10 , ox: 0, oy: 7, rotation: null }, anim: [
           { name: 'attackleft', count: 6 , fps: 9 },
           { name: 'hitleft' , count: 3 , fps: 5 },
           { name: 'hitright', count: 3 , fps: 5 },
@@ -205,7 +205,45 @@ class PhaserGame extends Component{
       }
 
     //Specify all assets in an object to iterate over
-    let assets = [char, skel, gob, wiz, hound, potion, sword]
+    let assetUnique = [ skel, gob, wiz, hound, potion, sword]
+    
+    let assets = [char];
+
+    function coordinateRange(coord){
+
+      let coordsArray = [
+        { minx: 7, miny: 7, maxx: 15, maxy: 12 }, 
+        { minx: 36, miny: 8, maxx: 45, maxy: 11 }, 
+        { minx: 32, miny: 22, maxx: 52, maxy: 22 },
+        { minx: 32, miny: 29, maxx: 51, maxy: 29 }, 
+        { minx: 2, miny: 19, maxx: 14, maxy: 28 }, 
+      ]
+      let coordPair = coordsArray[Math.floor(Math.random()*(5-0))]
+      let { minx, miny, maxx, maxy } = coordPair;
+      let r = 16; //resolution
+      if(coord=='x') 
+        return Math.ceil(Math.random() * (maxx - minx ) + minx) * r - 2;
+      if(coord=='y')
+        return Math.ceil(Math.random() * (maxy - miny ) + miny) * r - 2;
+    }
+
+    assetUnique.forEach(asset =>{
+      let i = 0;
+      let assetGroup = [];
+      while( i < asset.quant){
+        i ++;
+        assetGroup.push(Object.assign({}, asset));
+      }
+
+      assetGroup.forEach(asset =>{
+        asset.coordx = coordinateRange('x');
+        asset.coordy = coordinateRange('y');
+      })
+      assets = [...assets, ...assetGroup];
+    });
+
+
+    console.log(assets)
    
     this.assets = assets;
     

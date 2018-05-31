@@ -23,7 +23,7 @@ class DialogBox extends Component{
       
       <div className="dialogbox">
         <div className="avatarDiv">
-          <img src="./src/assets/wizard/avatar.png" id="avatar" alt="avatar" />
+          <img src="./src/assets/goblin/avatar.png" id="avatar" alt="avatar" />
         </div>
         <div id="text-box">
           <div id="title">{ this.state.currentTitle }</div>
