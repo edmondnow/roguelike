@@ -201,6 +201,29 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">../hound/avatar.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>50,50,100,100</rect>
+                <key>scale9Paddings</key>
+                <rect>50,50,100,100</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">../hound/dead/tile000.png</key>
+            <key type="filename">../hound/dead/tile001.png</key>
+            <key type="filename">../hound/dead/tile002.png</key>
+            <key type="filename">../hound/dead/tile003.png</key>
+            <key type="filename">../hound/dead/tile004.png</key>
+            <key type="filename">../hound/dead/tile005.png</key>
+            <key type="filename">../hound/dead/tile006.png</key>
+            <key type="filename">../hound/dead/tile007.png</key>
+            <key type="filename">../hound/dead/tile008.png</key>
+            <key type="filename">../hound/dead/tile009.png</key>
             <key type="filename">../hound/hitleft/tile000.png</key>
             <key type="filename">../hound/hitleft/tile001.png</key>
             <key type="filename">../hound/hitleft/tile002.png</key>

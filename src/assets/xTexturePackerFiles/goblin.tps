@@ -252,14 +252,14 @@
             <key type="filename">../goblin/attackright/tile004.png</key>
             <key type="filename">../goblin/attackright/tile005.png</key>
             <key type="filename">../goblin/attackright/tile006.png</key>
-            <key type="filename">../goblin/death/tile000.png</key>
-            <key type="filename">../goblin/death/tile001.png</key>
-            <key type="filename">../goblin/death/tile002.png</key>
-            <key type="filename">../goblin/death/tile003.png</key>
-            <key type="filename">../goblin/death/tile004.png</key>
-            <key type="filename">../goblin/death/tile005.png</key>
-            <key type="filename">../goblin/death/tile006.png</key>
-            <key type="filename">../goblin/death/tile007.png</key>
+            <key type="filename">../goblin/dead/tile000.png</key>
+            <key type="filename">../goblin/dead/tile001.png</key>
+            <key type="filename">../goblin/dead/tile002.png</key>
+            <key type="filename">../goblin/dead/tile003.png</key>
+            <key type="filename">../goblin/dead/tile004.png</key>
+            <key type="filename">../goblin/dead/tile005.png</key>
+            <key type="filename">../goblin/dead/tile006.png</key>
+            <key type="filename">../goblin/dead/tile007.png</key>
             <key type="filename">../goblin/hit/tile000.png</key>
             <key type="filename">../goblin/hit/tile001.png</key>
             <key type="filename">../goblin/hit/tile002.png</key>
@@ -290,6 +290,19 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">../goblin/avatar.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>50,50,100,100</rect>
+                <key>scale9Paddings</key>
+                <rect>50,50,100,100</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">../goblin/goblin.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -297,9 +310,9 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>92,28,183,56</rect>
+                <rect>200,160,400,320</rect>
                 <key>scale9Paddings</key>
-                <rect>92,28,183,56</rect>
+                <rect>200,160,400,320</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

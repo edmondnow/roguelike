@@ -3,6 +3,11 @@
   src: url('../src/assets/visitor1.ttf') format('truetype');
 }
 
+#lights {
+  font-family: 'Visitor', Verdana, Tahoma;
+  background-color: white;
+  width: 50px;
+}
 
 body {
   margin: 0;
@@ -10,7 +15,7 @@ body {
 }
 
 .gap{
-  margin: 0 70px;
+  margin: 0 30px;
 }
 
 #heart{
@@ -21,8 +26,6 @@ body {
 }
 
 #sword {
-  height: 20px;
-  width: 15px;
   position: relative;
   margin: 0 5px;
   top: 5px;
