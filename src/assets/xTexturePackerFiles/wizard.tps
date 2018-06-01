@@ -199,16 +199,16 @@
             <key type="filename">../wizard/attackright/tile005.png</key>
             <key type="filename">../wizard/attackright/tile006.png</key>
             <key type="filename">../wizard/attackright/tile007.png</key>
-            <key type="filename">../wizard/death/tile000.png</key>
-            <key type="filename">../wizard/death/tile001.png</key>
-            <key type="filename">../wizard/death/tile002.png</key>
-            <key type="filename">../wizard/death/tile003.png</key>
-            <key type="filename">../wizard/death/tile004.png</key>
-            <key type="filename">../wizard/death/tile005.png</key>
-            <key type="filename">../wizard/death/tile006.png</key>
-            <key type="filename">../wizard/death/tile007.png</key>
-            <key type="filename">../wizard/death/tile008.png</key>
-            <key type="filename">../wizard/death/tile009.png</key>
+            <key type="filename">../wizard/dead/tile000.png</key>
+            <key type="filename">../wizard/dead/tile001.png</key>
+            <key type="filename">../wizard/dead/tile002.png</key>
+            <key type="filename">../wizard/dead/tile003.png</key>
+            <key type="filename">../wizard/dead/tile004.png</key>
+            <key type="filename">../wizard/dead/tile005.png</key>
+            <key type="filename">../wizard/dead/tile006.png</key>
+            <key type="filename">../wizard/dead/tile007.png</key>
+            <key type="filename">../wizard/dead/tile008.png</key>
+            <key type="filename">../wizard/dead/tile009.png</key>
             <key type="filename">../wizard/hit/tile000.png</key>
             <key type="filename">../wizard/hit/tile001.png</key>
             <key type="filename">../wizard/hit/tile002.png</key>
@@ -243,6 +243,19 @@
                 <rect>20,20,40,40</rect>
                 <key>scale9Paddings</key>
                 <rect>20,20,40,40</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">../wizard/avatar.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>50,50,100,100</rect>
+                <key>scale9Paddings</key>
+                <rect>50,50,100,100</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

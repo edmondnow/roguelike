@@ -16,6 +16,7 @@ class PhaserGame extends Component{
       dmg: 10,
       weapon: `${path}/sword.png`,
       restitution: 3,
+      lights: false
 
     }
     
@@ -29,6 +30,7 @@ class PhaserGame extends Component{
   }
 
   componentDidMount(){
+
     this.game = new Phaser.Game(960, 576, Phaser.AUTO, "phaser-container", 
         { 
           create: this.create,
@@ -36,21 +38,72 @@ class PhaserGame extends Component{
           preload: this.preload
         }
    );
+
   }
 
-   attack(body, enemy){
-    console.log(enemy)
-    enemy.sprite.animations.play('hit');
-    enemy.sprite.animations.play('hitleft');
+   attack(player, enemy){
+    let { cursors } = this;
+    if(enemy.sprite.hp>0){
+      enemy.sprite.animations.play('hit');
+      enemy.sprite.animations.play('hitleft');
+    }
+    
+    if (cursors.left.isDown){
+      player.sprite.animations.play('attackleft')
+    } else if(cursors.right.isDown){
+      player.sprite.animations.play('attackright')
+    } if (cursors.up.isDown){
+      player.sprite.animations.play('attackup')
+    } else if(cursors.down.isDown){
+      player.sprite.animations.play('attackdown')
+    } 
+
     setTimeout( ()=>{
       enemy.sprite.animations.play('idle')
       enemy.sprite.animations.play('idleleft')
     }, 700  )
-    this.setState({ movement: false, health: this.state.health -10 });
+    enemy.sprite.hp -= this.state.dmg;
+    if(enemy.sprite.hp <= 0){
+        enemy.sprite.dmg = 0;
+        enemy.sprite.animations.play('dead')
+        setTimeout(()=>{
+          enemy.sprite.kill();
+        }, 700)
+      }
+  
+      
+    console.log(enemy.sprite.hp, this.state.dmg)
+    this.setState({ movement: false, health: this.state.health - enemy.sprite.dmg });
     setTimeout( ()=>{
       this.setState({ movement: true })
     }, 500)
-      console.log(this.state.health)
+
+  }
+
+
+  updateShadowTexture(){
+    //shadowTexture implementations from Matthias.R
+    //https://codepen.io/Hamatek/pen/mEBJpK
+    this.lightSprite.reset(this.game.camera.x - 10, this.game.camera.y - 10);
+    
+    var mc = this.char.body.sprite
+    var ctx = this.shadowTexture.context;
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, this.game.width + 20, this.game.height + 20);
+    
+    var x = mc.x - this.game.camera.x + 20, y = mc.y - this.game.camera.y + 20;
+    var gradient = ctx.createRadialGradient(
+      x, y, 100 * 0.75,
+      x, y, 100
+    );
+    gradient.addColorStop(0, "rgba(255, 255, 255, 1.0)");
+    gradient.addColorStop(1, "rgba(255, 255, 255, 0.0)");
+    ctx.beginPath();
+    ctx.fillStyle = gradient;
+    ctx.arc(x, y, 100, 0, Math.PI*2);
+    ctx.fill();
+    
+    this.shadowTexture.dirty = true;
   }
 
   health(body, potion){
@@ -58,15 +111,13 @@ class PhaserGame extends Component{
     body.velocity.y = 0;
     potion.sprite.kill();
     this.setState({health: this.state.health + 10});
-    console.log(this.state.health)
   }
 
   dmg(body, weapon){
     body.velocity.x = 0;
     body.velocity.y = 0;
     weapon.sprite.kill();
-    this.setState({attack: this.state.dmg + 10});
-    console.log(this.state.dmg);
+    this.setState({dmg: this.state.dmg + 10});
   }
 
       
@@ -81,7 +132,10 @@ class PhaserGame extends Component{
       game.physics.p2.enable(sprite);
       sprite.scale.setTo(asset.scale, asset.scale)
       sprite.anchor.setTo(.5,.5);
-      
+      if(asset.type === "monster"){
+          sprite.hp = asset.hp;
+          sprite.dmg = asset.dmg
+      }
       let { body, animations } = sprite;
 
       // Charachter Body Config
@@ -110,6 +164,7 @@ class PhaserGame extends Component{
         charBody.setCollisionGroup(charCG);
         charBody.collides(otherCG);
         charBody.collides(wallsCG);
+        game.camera.follow(sprite);
       } else {
         body.setCollisionGroup(otherCG);
         body.collides(charCG);
@@ -133,6 +188,8 @@ class PhaserGame extends Component{
   preload(){
     let { game } = this;
     let path = './src/assets';
+    
+
 
     let char =  { name: 'char', variable: null, type: 'player', mode: 'atlas', quant:  1, path: `${path}/char/char`, debug: false,
         coordx: 160, coordy: 155, scale: 0.5, rect: {w: 15 , h: 7.5 , ox: -1, oy: 4, rotation: null }, anim: [
@@ -140,14 +197,19 @@ class PhaserGame extends Component{
           { name: 'left' , count: 5 , fps: 9 },
           { name: 'up' , count: 3 , fps: 9 },
           { name: 'down' , count: 3 , fps: 9 },
-          { name: 'idle' , count: 2 , fps: 3 }
+          { name: 'idle' , count: 2 , fps: 3 },
+          { name: 'attackdown' , count: 4 , fps: 8 },
+          { name: 'attackup' , count: 4 , fps: 8 },
+          { name: 'attackleft' , count: 4 , fps: 8 },
+          { name: 'attackright' , count: 4 , fps: 8 },
+
         ]
        }
 
-    let skel =   { name: 'skel', variable: null, type: 'monster', mode: 'atlas', quant:  5, dmg: 10, health: 30, path: `${path}/skeleton/skeleton`, debug: false,
+    let skel =   { name: 'skel', variable: null, type: 'monster', mode: 'atlas', quant:  5, dmg: 10, hp: 50, path: `${path}/skeleton/skeleton`, debug: false,
         coordx: null, coordy: null, scale: 0.9, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 18 , fps: 9 },
-          { name: 'dead', count: 15, fps: 9 },
+          { name: 'dead', count: 15, fps: 17 },
           { name: 'hitleft', count: 8, fps: 10 },
           { name: 'hitright', count: 8, fps: 9 },
           { name: 'idleleft', count: 11, fps: 6 },
@@ -159,11 +221,11 @@ class PhaserGame extends Component{
         ]
       }
 
-    let gob =  { name: 'gob', variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 10, health: 30, path: `${path}/goblin/goblin`, debug: false,
+    let gob =  { name: 'gob', variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 5, hp: 40, path: `${path}/goblin/goblin`, debug: false,
         coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 7 , fps: 9 },
           { name: 'attackleft' , count: 7 , fps: 9 },
-          { name: 'dead', count: 8 , fps: 9 },
+          { name: 'dead', count: 8 , fps: 10 },
           { name: 'hit', count: 3, fps: 5 },
           { name: 'idle', count: 3, fps: 3.5 },
           { name: 'left', count: 6, fps: 6 },
@@ -171,11 +233,11 @@ class PhaserGame extends Component{
         ]
        }
     
-    let wiz =  { name: 'wiz', variable: null, type: 'monster', mode: 'atlas', quant:  3, dmg: 10, health: 30, path: `${path}/wizard/wizard`, debug: false,
+    let wiz =  { name: 'wiz', variable: null, type: 'monster', mode: 'atlas', quant:  3, dmg: 15, hp: 60, path: `${path}/wizard/wizard`, debug: false,
         coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright', count: 8 , fps: 9 },
           { name: 'attackleft' , count: 8 , fps: 9 },
-          { name: 'dead', count: 10 , fps: 9 },
+          { name: 'dead', count: 10 , fps: 11 },
           { name: 'hit', count: 10, fps: 5 },
           { name: 'idle', count: 10, fps: 3 },
           { name: 'left', count: 6, fps: 6 },
@@ -183,10 +245,11 @@ class PhaserGame extends Component{
         ]
        }
 
-    let hound =  { name: 'hound', variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 10, health: 30, path: `${path}/hound/hound`, debug: false,
+    let hound =  { name: 'hound', variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 7, hp: 20, path: `${path}/hound/hound`, debug: false,
         coordx: null, coordy: null, scale: 0.7, rect: {w: 20 , h: 10 , ox: 0, oy: 7, rotation: null }, anim: [
           { name: 'attackleft', count: 6 , fps: 9 },
           { name: 'hitleft' , count: 3 , fps: 5 },
+          { name: 'dead' , count: 9 , fps: 11 }, 
           { name: 'hitright', count: 3 , fps: 5 },
           { name: 'idleleft', count: 6, fps: 4 },
           { name: 'idleright', count: 6, fps: 3 },
@@ -242,8 +305,6 @@ class PhaserGame extends Component{
       assets = [...assets, ...assetGroup];
     });
 
-
-    console.log(assets)
    
     this.assets = assets;
     
@@ -261,6 +322,8 @@ class PhaserGame extends Component{
       if (mode == 'image')
         game.load.image(name, `${path}.png`);
     })
+
+
     
   }
 
@@ -268,7 +331,7 @@ class PhaserGame extends Component{
     let { game, assets } = this;
     let wallCollisions = game.add.tilemap('DungeonTilemap')
     let physicsTiles = [];
-
+    
     let layers = [ 
       { name: 'background', collision: false, variable: null }, 
       { name: 'backgrounddetails', collision: true, variable: null  },
@@ -279,8 +342,9 @@ class PhaserGame extends Component{
       { name: 'foregroundtops', collision: false, variable: null  }
     ];
  
+
     // Config Layer, Map and Stage //
-    game.stage.backgroundColor = '#2d2d2d';
+    game.stage.backgroundColor = '#000000';
     let map = game.add.tilemap('DungeonTilemap');
     map.addTilesetImage('DungeonTileset', 'DungeonTileset');
     map.addTilesetImage('WallTileset', 'WallTileset');
@@ -312,12 +376,15 @@ class PhaserGame extends Component{
       return layer
     });
     
-
+    this.shadowTexture = this.game.add.bitmapData(this.game.width + 20, this.game.height + 20);
+    this.lightSprite = this.game.add.image(0, 0, this.shadowTexture);
+    this.lightSprite.blendMode = Phaser.blendModes.MULTIPLY;
 
   //  Export to class //
     this.char = assets[0].variable;
     this.cursors = game.input.keyboard.createCursorKeys();
     this.map = map;
+    
 
   }
 
@@ -345,7 +412,7 @@ class PhaserGame extends Component{
         char.animations.play('idle');
       }
     }
-    
+    this.updateShadowTexture();
   }
 
   render(){
