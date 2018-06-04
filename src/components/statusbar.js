@@ -10,7 +10,7 @@ const StatusBar = (props) => {
           <img src="./src/assets/char/avatar.png" alt="charavatar" id="charavatar"/> {lvl}/10
         </span>
         <span className="gap">
-          xp {xp}/{xpthreshold}
+          {xp.length == 1 ? `00${xp}` : `${xp}` }/{xpthreshold}
         </span>
         <span className="gap">
           <img src="./src/assets/heart.png" alt="heart" id="heart"/>{health}/100

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import StatusBar from './components/statusbar';
 import DialogBox from './components/dialogbox';
+import Menu from './components/menu';
 
 class PhaserGame extends Component{
   constructor(props){
@@ -18,7 +19,7 @@ class PhaserGame extends Component{
       weapon: `${path}/sword.png`,
       restitution: 3,
       lights: true,
-
+      gamestart: false,
     }
     
     this.create = this.create.bind(this);
@@ -29,19 +30,11 @@ class PhaserGame extends Component{
     this.health = this.health.bind(this);
     this.attack = this.attack.bind(this);
     this.lightSwitch = this.lightSwitch.bind(this);
+    this.startGame = this.startGame.bind(this);
   }
 
-  componentDidMount(){
-
-    this.game = new Phaser.Game(960, 576, Phaser.AUTO, "phaser-container", 
-        { 
-          create: this.create,
-          update: this.update,
-          preload: this.preload
-        }
-   );
-
-  }
+ 
+  
 
   lightSwitch(){
     this.setState({lights: !this.state.lights})
@@ -66,7 +59,7 @@ class PhaserGame extends Component{
 
     setTimeout( ()=>{
       enemy.sprite.animations.play('idle')
-      enemy.sprite.animations.play('idleleft')
+      enemy.sprite.animations.play('idleright')
     }, 700  )
     enemy.sprite.hp -= this.state.dmg;
     if(enemy.sprite.hp <= 0){
@@ -89,6 +82,18 @@ class PhaserGame extends Component{
       this.setState({ movement: true })
     }, 500)
 
+  }
+
+  startGame(){
+    this.setState({gamestart: !this.state.gamestart }) 
+
+    this.game = new Phaser.Game(960, 576, Phaser.AUTO, "phaser-container", 
+        { 
+          create: this.create,
+          update: this.update,
+          preload: this.preload
+        }
+      );
   }
 
 
@@ -192,7 +197,7 @@ class PhaserGame extends Component{
           charBody.createBodyCallback(sprite, this.dmg, this)
         if(asset.type == 'monster'){
           sprite.animations.play('idle')
-          sprite.animations.play('idleleft')
+          sprite.animations.play('idleright')
           charBody.createBodyCallback(sprite, this.attack, this)
         }
       }
@@ -285,9 +290,42 @@ class PhaserGame extends Component{
       }
 
     //Specify all assets in an object to iterate over
-    let assetUnique = [ skel, gob, wiz, hound, potion, sword]
+    let assetUnique = [ potion, sword, skel, gob, wiz, hound ]
     
-    let assets = [char];
+    let brains =  Object.assign({}, skel);
+    brains.scale = 1.2;
+    brains.coordx = 580;
+    brains.coordy = 400;
+    brains.debug = true;
+    brains.rect.ox = -5;
+    brains.rect.oy = +10;
+
+    let ednerd = Object.assign({}, gob);
+
+    ednerd.scale = 0.8;
+    ednerd.coordx = 390;
+    ednerd.coordy = 45;
+    ednerd.rect.ox = 0;
+    ednerd.rect.oy = 2;
+
+    let pleblo = Object.assign({}, wiz);
+
+    pleblo.scale = 0.7;
+    pleblo.coordx = 136;
+    pleblo.coordy = 360;
+    pleblo.rect.ox = -2;
+    pleblo.rect.w = 17;
+
+    let jdog = Object.assign({}, hound);
+
+    jdog.scale = 1;
+    jdog.coordx = 660;
+    jdog.coordy = 150;
+    jdog.rect.w = 30;
+
+
+
+    let assets = [char, brains, ednerd, pleblo, jdog];
 
     function coordinateRange(coord){
 
@@ -433,12 +471,14 @@ class PhaserGame extends Component{
   }
 
   render(){
+    if(!this.state.gamestart){
+      return <div><Menu startGame={this.startGame}/> </div>
+    }
     return(
-
         <div>
           <StatusBar props={this.state} lightSwitch={this.lightSwitch}/>
           <div id="phaser-container"/>
-          <DialogBox />
+          <DialogBox/>
         </div>
     )
   }

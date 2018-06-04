@@ -3,9 +3,57 @@
   src: url('../src/assets/visitor1.ttf') format('truetype');
 }
 
-#lights {
+button {
   font-family: 'Visitor', Verdana, Tahoma;
   background-color: white;
+}
+
+#arrows {
+  width: 40px;
+  margin: 0px 5px;
+}
+
+#fullscreen {
+  font-size: 0.6em;
+}
+
+
+#ins {
+  margin:  25px 0px
+}
+
+#menu{
+  width: 400px;
+  height: 260px;
+  padding: 30px;
+  margin: 50px auto;
+  border: 2px solid rgb(102, 88, 64);
+  background-color: rgb(60, 40, 53);
+  font-family: 'Visitor', Verdana, Tahoma;
+  color: white;
+  font-size: 1.4em;
+  text-align: center;
+}
+
+#menubutton{
+  width: 150px;
+  height: 40px;
+  font-size: 1em;
+  display: block;
+  margin: 20px auto 10px auto;
+
+}
+
+#bakery {
+  width: 300px;
+  margin:  0 auto;
+  display: block;
+}
+
+
+
+#lights {
+ 
   width: 50px;
 }
 
@@ -15,7 +63,7 @@ body {
 }
 
 .gap{
-  margin: 0 30px;
+  margin: 0 28px;
 }
 
 #heart{
@@ -35,7 +83,6 @@ body {
   width: 50%;
   margin: 20px auto 0 auto;
   margin-bottom: 20px;
-  background-color: #1C1117;
   height: 30px;
   color: white;
   text-align: center;
