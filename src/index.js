@@ -20,6 +20,11 @@ class PhaserGame extends Component{
       restitution: 3,
       lights: true,
       gamestart: false,
+      pleblo: true,
+      ednerd: true,
+      jdog: true,
+      brains: true,
+      encounter: null
     }
     
     this.create = this.create.bind(this);
@@ -31,11 +36,14 @@ class PhaserGame extends Component{
     this.attack = this.attack.bind(this);
     this.lightSwitch = this.lightSwitch.bind(this);
     this.startGame = this.startGame.bind(this);
+    this.movementAllow = this.movementAllow.bind(this)
   }
 
  
+  movementAllow(){
+    this.setState({movement: !this.state.movement})
+  }
   
-
   lightSwitch(){
     this.setState({lights: !this.state.lights})
   }
@@ -66,6 +74,11 @@ class PhaserGame extends Component{
         enemy.sprite.dmg = 0;
         this.setState({ xp: this.state.xp + enemy.sprite.xp })
         enemy.sprite.animations.play('dead')
+        console.log(enemy.sprite, enemy.sprite.bossChar!=undefined)
+        if(enemy.sprite.bossChar!=undefined){
+          console.log('kill')
+          this.setState({ednerd: false});
+        }
         setTimeout(()=>{
           enemy.sprite.kill();
         }, 700)
@@ -76,7 +89,6 @@ class PhaserGame extends Component{
       this.setState({lvl: this.state.lvl + 1, xp: remainder, xpthreshold: this.state.xpthreshold + 50, dmg: this.state.dmg + 20})
     }
 
-    console.log(enemy.sprite.hp, this.state.dmg)
     this.setState({ movement: false, health: this.state.health - enemy.sprite.dmg });
     setTimeout( ()=>{
       this.setState({ movement: true })
@@ -106,7 +118,6 @@ class PhaserGame extends Component{
     }
   
     this.lightSprite.reset(this.game.camera.x - 10, this.game.camera.y - 10);
-    
     var mc = this.char.body.sprite
     var ctx = this.shadowTexture.context;
     ctx.fillStyle = "#000000";
@@ -125,6 +136,29 @@ class PhaserGame extends Component{
     ctx.fill();
     
     this.shadowTexture.dirty = true;
+  }
+
+  checkPos(){
+    let p = 65; //proximity
+    let { x, y } = this.char.body.sprite
+    x = Math.floor(x);
+    y = Math.floor(y);
+    let bossCoordinates = [
+    { name: 'ednerd', x:390, y:45 },
+    { name: 'pleblo', x:136, y:360 },
+    { name: 'brains', x:580, y:400 },
+    { name: 'jdog', x:650, y:150 },
+     ]
+    bossCoordinates.forEach(coord =>{
+      if((x>coord.x-p&&x<coord.x + p)&&(y>coord.y-p&&y<coord.y + p)){
+        this.char.body.sprite.animations.play('idle')
+       if(this.state[coord.name]){
+        this.setState({movement: true, encounter: coord.name})
+       }
+      }
+    });
+
+    
   }
 
   health(body, potion){
@@ -228,7 +262,7 @@ class PhaserGame extends Component{
         ]
        }
 
-    let skel =   { name: 'skel', variable: null, type: 'monster', mode: 'atlas', quant:  5, dmg: 10, hp: 50, path: `${path}/skeleton/skeleton`, debug: false,
+    let skel =   { name: 'skel', variable: null,  bossChar: undefined, type: 'monster', mode: 'atlas', quant:  5, dmg: 10, hp: 50, path: `${path}/skeleton/skeleton`, debug: false,
         coordx: null, xp: 30, coordy: null, scale: 0.9, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 18 , fps: 9 },
           { name: 'dead', count: 15, fps: 16 },
@@ -243,7 +277,7 @@ class PhaserGame extends Component{
         ]
       }
 
-    let gob =  { name: 'gob', xp: 10,variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 5, hp: 40, path: `${path}/goblin/goblin`, debug: false,
+    let gob =  { name: 'gob', xp: 10, bossChar: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 5, hp: 40, path: `${path}/goblin/goblin`, debug: false,
         coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 7 , fps: 9 },
           { name: 'attackleft' , count: 7 , fps: 9 },
@@ -255,7 +289,7 @@ class PhaserGame extends Component{
         ]
        }
     
-    let wiz =  { name: 'wiz', xp: 40, variable: null, type: 'monster', mode: 'atlas', quant:  3, dmg: 15, hp: 60, path: `${path}/wizard/wizard`, debug: false,
+    let wiz =  { name: 'wiz', xp: 40, variable: null, bossChar: undefined, type: 'monster', mode: 'atlas', quant:  3, dmg: 15, hp: 60, path: `${path}/wizard/wizard`, debug: false,
         coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright', count: 8 , fps: 9 },
           { name: 'attackleft' , count: 8 , fps: 9 },
@@ -267,7 +301,7 @@ class PhaserGame extends Component{
         ]
        }
 
-    let hound =  { name: 'hound', xp: 20,  variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 7, hp: 20, path: `${path}/hound/hound`, debug: false,
+    let hound =  { name: 'hound', xp: 20,  bossChar: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 7, hp: 20, path: `${path}/hound/hound`, debug: false,
         coordx: null, coordy: null, scale: 0.7, rect: {w: 20 , h: 10 , ox: 0, oy: 7, rotation: null }, anim: [
           { name: 'attackleft', count: 6 , fps: 9 },
           { name: 'hitleft' , count: 3 , fps: 5 },
@@ -299,6 +333,7 @@ class PhaserGame extends Component{
     brains.debug = true;
     brains.rect.ox = -5;
     brains.rect.oy = +10;
+    brains.bossChar = 'brains'
 
     let ednerd = Object.assign({}, gob);
 
@@ -307,6 +342,7 @@ class PhaserGame extends Component{
     ednerd.coordy = 45;
     ednerd.rect.ox = 0;
     ednerd.rect.oy = 2;
+    ednerd.bossChar = 'ednerd';
 
     let pleblo = Object.assign({}, wiz);
 
@@ -315,6 +351,7 @@ class PhaserGame extends Component{
     pleblo.coordy = 360;
     pleblo.rect.ox = -2;
     pleblo.rect.w = 17;
+    pleblo.bossChar = 'pleblo'
 
     let jdog = Object.assign({}, hound);
 
@@ -322,6 +359,7 @@ class PhaserGame extends Component{
     jdog.coordx = 660;
     jdog.coordy = 150;
     jdog.rect.w = 30;
+    jdog.bossChar = 'jdog'
 
 
 
@@ -468,6 +506,7 @@ class PhaserGame extends Component{
       }
     }
     this.updateShadowTexture();
+    this.checkPos();
   }
 
   render(){
@@ -478,7 +517,7 @@ class PhaserGame extends Component{
         <div>
           <StatusBar props={this.state} lightSwitch={this.lightSwitch}/>
           <div id="phaser-container"/>
-          <DialogBox/>
+          <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter}/>
         </div>
     )
   }
