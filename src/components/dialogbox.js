@@ -9,6 +9,7 @@ class DialogBox extends Component{
     super(props);
 
     this.state = {
+      currentDialog: null,
       currentText: null,
       currentTitle: null,
       nextAllow: false,
@@ -16,10 +17,6 @@ class DialogBox extends Component{
       imgsrc: 'goblin',
       titles: { brains:'NoBrains CereBro', pleblo: 'Pleblo ElMago', jdog: 'J-Dog the HellHound', ednerd: 'Ednerd Gobbler' },
       imgs: { brains: 'skeleton', pleblo: 'wizard', ednerd: 'goblin', jdog: 'hound' },
-      plebloalive: true,
-      ednerdalive: true,
-      jdogalive: true,
-      brainsalive: true,
       show: true,
       actorIt: 0,
       dialogIt: 0,
@@ -31,40 +28,11 @@ class DialogBox extends Component{
 
   }
   
-  dialogControl(e){
+  dialogControl(e, dialog){
     let { imgs, titles, actorIt, dialogIt } = this.state;
     this.setState({startDelay: 0})
-    let initial = [
-      {who: 'pleblo', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-      {who: 'ednerd', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-      {who: 'jdog', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-      {who: 'brains', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}
-    ]
-
-    let plebloEncounter = [
-      {who: 'pleblo', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-    ]
-
-    let plebloDead = [
-        {who: 'pleblo', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-    ]
-
-
-    let jdogEncounter = [
-        {who: 'pleblo', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-    ]
-
-
-    let jdogDead = [
-        {who: 'pleblo', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-    ]
-
-
-    var current = initial;
-
+    var current = this.state.currentDialog;
     var selected = current[this.state.actorIt];
-
-    
 
     if(e.keyCode==32&&this.state.nextAllow){
 
@@ -103,14 +71,45 @@ class DialogBox extends Component{
   resetDialog(){
     this.setState({nextAllow: true})
   }
+  
 
-  componentWillReceiveProps(){
-   
+
+  componentDidUpdate(prevProps, prevState, snapshot){
+    let encounters = {
+      pleblo: [{who: 'pleblo', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
+      ednerd: [{who: 'ednerd', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
+      brains: [{who: 'brains', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
+      jdog: [{who: 'jdog', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
+    }
+    let deaths = {
+      pleblo: [{who: 'pleblo', say: ['Hi, Marty', 'I am ded', 'Yaddaayayaya']}],
+      ednerd: [{who: 'ednerd', say: ['Hi, Marty', 'I am ded', 'Yaddaayayaya']}],
+      brains: [{who: 'brains', say: ['Hi, Marty', 'I am ded', 'Yaddaayayaya']}],
+      jdog: [{who: 'jdog', say: ['Hi, Marty', 'I am ded', 'Yaddaayayaya']}],
+    }
+    
+    if(prevProps.encounter!=this.props.encounter&&this.props.encounter!=null){
+      this.setState({currentDialog: encounters[this.props.encounter], show: true})
+      this.props.movementAllow()
+    }
+
+    if(prevProps.dead!=this.props.dead&&this.props.dead!=null){
+      this.setState({currentDialog: deaths[this.props.dead], show: true})
+      this.props.movementAllow()
+    }
+
   }
 
   componentDidMount(){
     document.addEventListener("keydown", this.dialogControl, false)
-    this.setState({currentTitle: 'oooooooooooooooooo', currentText: 'brrrrrrrrrrrrr' })
+    let initial = [
+      {who: 'pleblo', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
+      //{who: 'ednerd', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
+      //{who: 'jdog', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
+      //{who: 'brains', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}
+    ]
+
+    this.setState({currentDialog: initial})
   }
 
   componentWillUnmount(){

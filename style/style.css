@@ -149,3 +149,13 @@ canvas {
 .avatarDiv {
   background-color: #5f021F;
 }
+
+canvas {
+  position: relative,
+  top: -560px;
+}
+
+#phaser-container {
+  position: initial
+}
+

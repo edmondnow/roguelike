@@ -10,23 +10,25 @@ class PhaserGame extends Component{
     let path = './src/assets';
 
     this.state = {
-      movement: true,
-      health: 100,
+      movement: false,
+      health: 1000,
       xp: 0,
       xpthreshold: 200,
       lvl: 1,
-      dmg: 10,
+      dmg: 1,
       weapon: `${path}/sword.png`,
-      restitution: 3,
       lights: true,
       gamestart: false,
       pleblo: true,
       ednerd: true,
       jdog: true,
       brains: true,
-      encounter: null
+      encounter: null,
+      dead: null,
+      allcoords: []
     }
     
+
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.preload = this.preload.bind(this);
@@ -36,7 +38,9 @@ class PhaserGame extends Component{
     this.attack = this.attack.bind(this);
     this.lightSwitch = this.lightSwitch.bind(this);
     this.startGame = this.startGame.bind(this);
-    this.movementAllow = this.movementAllow.bind(this)
+    this.movementAllow = this.movementAllow.bind(this);
+    this.coordinateRange = this.coordinateRange.bind(this);
+    this.noVelocity = this.noVelocity.bind(this)
   }
 
  
@@ -50,10 +54,11 @@ class PhaserGame extends Component{
 
   attack(player, enemy){
     let { cursors } = this;
-    if(enemy.sprite.hp>0){
+    if(enemy.sprite.hp > 0){
       enemy.sprite.animations.play('hit');
       enemy.sprite.animations.play('hitleft');
     }
+    
     
     if (cursors.left.isDown){
       player.sprite.animations.play('attackleft')
@@ -64,6 +69,7 @@ class PhaserGame extends Component{
     } else if(cursors.down.isDown){
       player.sprite.animations.play('attackdown')
     } 
+  
 
     setTimeout( ()=>{
       enemy.sprite.animations.play('idle')
@@ -74,10 +80,8 @@ class PhaserGame extends Component{
         enemy.sprite.dmg = 0;
         this.setState({ xp: this.state.xp + enemy.sprite.xp })
         enemy.sprite.animations.play('dead')
-        console.log(enemy.sprite, enemy.sprite.bossChar!=undefined)
-        if(enemy.sprite.bossChar!=undefined){
-          console.log('kill')
-          this.setState({ednerd: false});
+        if(enemy.sprite.boss!=undefined){
+          this.setState({[enemy.sprite.boss]: false, dead: enemy.sprite.boss});
         }
         setTimeout(()=>{
           enemy.sprite.kill();
@@ -89,16 +93,19 @@ class PhaserGame extends Component{
       this.setState({lvl: this.state.lvl + 1, xp: remainder, xpthreshold: this.state.xpthreshold + 50, dmg: this.state.dmg + 20})
     }
 
-    this.setState({ movement: false, health: this.state.health - enemy.sprite.dmg });
+    this.setState({ movement: !this.state.movement, health: this.state.health - enemy.sprite.dmg });
     setTimeout( ()=>{
-      this.setState({ movement: true })
+      this.setState({ movement: !this.state.movement })
     }, 500)
 
   }
 
   startGame(){
-    this.setState({gamestart: !this.state.gamestart }) 
 
+    
+    if(this.state.gamestart){
+      window.location.reload();
+    } else {
     this.game = new Phaser.Game(960, 576, Phaser.AUTO, "phaser-container", 
         { 
           create: this.create,
@@ -106,12 +113,16 @@ class PhaserGame extends Component{
           preload: this.preload
         }
       );
+    }
+
+    this.setState({
+      gamestart: true, 
+    }) 
+
   }
 
 
   updateShadowTexture(){
-    //shadowTexture implementations from Matthias.R
-    //https://codepen.io/Hamatek/pen/mEBJpK
     if(!this.state.lights){
       this.lightSprite.visible = false;
       return;
@@ -151,8 +162,7 @@ class PhaserGame extends Component{
      ]
     bossCoordinates.forEach(coord =>{
       if((x>coord.x-p&&x<coord.x + p)&&(y>coord.y-p&&y<coord.y + p)){
-        this.char.body.sprite.animations.play('idle')
-       if(this.state[coord.name]){
+       if(this.state[coord.name]&&this.state.encounter!=coord.name){
         this.setState({movement: true, encounter: coord.name})
        }
       }
@@ -175,6 +185,57 @@ class PhaserGame extends Component{
     this.setState({dmg: this.state.dmg + 10});
   }
 
+  coordinateRange(){
+    
+    let coordsArray = [
+      { minx: 7, miny: 7, maxx: 15, maxy: 12 }, 
+      { minx: 36, miny: 8, maxx: 45, maxy: 11 }, 
+      { minx: 32, miny: 22, maxx: 52, maxy: 22 },
+      { minx: 32, miny: 29, maxx: 51, maxy: 29 }, 
+      { minx: 2, miny: 19, maxx: 14, maxy: 28 }, 
+    ]
+
+    function returnRandom(){
+      newCoords.x =  Math.floor(Math.random() * (maxx - minx ) + minx) * r - 2;
+      newCoords.y = Math.floor(Math.random() * (maxy - miny ) + miny) * r - 2;
+    }
+
+    var close = false; 
+
+    let coordPair = coordsArray[Math.floor(Math.random()*(5-0))]
+    let { minx, miny, maxx, maxy } = coordPair;
+    let r = 16; //resolution
+    let newCoords = {};
+    returnRandom();
+
+
+    var remake = () => {
+      close = this.state.allcoords.forEach(coord =>{
+        if(coord.x%newCoords.x<64||coord.y%newCoords.y<64){
+            returnRandom();
+            return true
+        }
+
+        return false 
+      })
+    }
+
+    
+    while(close){
+      remake();
+    }
+
+    remake();
+
+    this.setState({allcoords: [...this.state.allcoords, newCoords]});
+    return newCoords
+  }
+
+  noVelocity(body, tile){
+    
+    body.velocity.x = 0;
+    body.velocity.y = 0;
+  }
       
   generateAsset(assets, game, charCG, otherCG, wallsCG){
     let charBody;
@@ -191,6 +252,9 @@ class PhaserGame extends Component{
           sprite.hp = asset.hp;
           sprite.dmg = asset.dmg;
           sprite.xp = asset.xp;
+        if(asset.boss != undefined){
+          sprite.boss = asset.boss;
+        }
       }
       let { body, animations } = sprite;
 
@@ -198,7 +262,6 @@ class PhaserGame extends Component{
       body.fixedRotation = true; // no rotation
       body.collideWorldBounds = true;
       body.clearShapes(); 
-      body.damping = 0.99;
       body.addRectangle(asset.rect.w, asset.rect.h, asset.rect.ox, asset.rect.oy)
       body.debug = asset.debug;
       
@@ -220,7 +283,7 @@ class PhaserGame extends Component{
         charBody.setCollisionGroup(charCG);
         charBody.collides(otherCG);
         charBody.collides(wallsCG);
-        game.camera.follow(sprite);
+        charBody.damping = 0.99
       } else {
         body.setCollisionGroup(otherCG);
         body.collides(charCG);
@@ -262,7 +325,7 @@ class PhaserGame extends Component{
         ]
        }
 
-    let skel =   { name: 'skel', variable: null,  bossChar: undefined, type: 'monster', mode: 'atlas', quant:  5, dmg: 10, hp: 50, path: `${path}/skeleton/skeleton`, debug: false,
+    let skel =   { name: 'skel', variable: null,  boss: undefined, type: 'monster', mode: 'atlas', quant:  5, dmg: 10, hp: 50, path: `${path}/skeleton/skeleton`, debug: false,
         coordx: null, xp: 30, coordy: null, scale: 0.9, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 18 , fps: 9 },
           { name: 'dead', count: 15, fps: 16 },
@@ -277,7 +340,7 @@ class PhaserGame extends Component{
         ]
       }
 
-    let gob =  { name: 'gob', xp: 10, bossChar: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 5, hp: 40, path: `${path}/goblin/goblin`, debug: false,
+    let gob =  { name: 'gob', xp: 10, boss: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 10, dmg: 5, hp: 40, path: `${path}/goblin/goblin`, debug: false,
         coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 7 , fps: 9 },
           { name: 'attackleft' , count: 7 , fps: 9 },
@@ -289,7 +352,7 @@ class PhaserGame extends Component{
         ]
        }
     
-    let wiz =  { name: 'wiz', xp: 40, variable: null, bossChar: undefined, type: 'monster', mode: 'atlas', quant:  3, dmg: 15, hp: 60, path: `${path}/wizard/wizard`, debug: false,
+    let wiz =  { name: 'wiz', xp: 40, variable: null, boss: undefined, type: 'monster', mode: 'atlas', quant:  5, dmg: 15, hp: 60, path: `${path}/wizard/wizard`, debug: false,
         coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright', count: 8 , fps: 9 },
           { name: 'attackleft' , count: 8 , fps: 9 },
@@ -301,7 +364,7 @@ class PhaserGame extends Component{
         ]
        }
 
-    let hound =  { name: 'hound', xp: 20,  bossChar: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 7, hp: 20, path: `${path}/hound/hound`, debug: false,
+    let hound =  { name: 'hound', xp: 20,  boss: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 7, hp: 20, path: `${path}/hound/hound`, debug: false,
         coordx: null, coordy: null, scale: 0.7, rect: {w: 20 , h: 10 , ox: 0, oy: 7, rotation: null }, anim: [
           { name: 'attackleft', count: 6 , fps: 9 },
           { name: 'hitleft' , count: 3 , fps: 5 },
@@ -333,7 +396,7 @@ class PhaserGame extends Component{
     brains.debug = true;
     brains.rect.ox = -5;
     brains.rect.oy = +10;
-    brains.bossChar = 'brains'
+    brains.boss = 'brains'
 
     let ednerd = Object.assign({}, gob);
 
@@ -342,7 +405,7 @@ class PhaserGame extends Component{
     ednerd.coordy = 45;
     ednerd.rect.ox = 0;
     ednerd.rect.oy = 2;
-    ednerd.bossChar = 'ednerd';
+    ednerd.boss = 'ednerd';
 
     let pleblo = Object.assign({}, wiz);
 
@@ -351,7 +414,7 @@ class PhaserGame extends Component{
     pleblo.coordy = 360;
     pleblo.rect.ox = -2;
     pleblo.rect.w = 17;
-    pleblo.bossChar = 'pleblo'
+    pleblo.boss = 'pleblo'
 
     let jdog = Object.assign({}, hound);
 
@@ -359,29 +422,15 @@ class PhaserGame extends Component{
     jdog.coordx = 660;
     jdog.coordy = 150;
     jdog.rect.w = 30;
-    jdog.bossChar = 'jdog'
+    jdog.boss = 'jdog'
 
 
 
     let assets = [char, brains, ednerd, pleblo, jdog];
+    assets.forEach( asset =>{
+      this.setState({ allcoords: [ ...this.state.allcoords, { x: asset.coordx, y: asset.coordy } ] })
+    })
 
-    function coordinateRange(coord){
-
-      let coordsArray = [
-        { minx: 7, miny: 7, maxx: 15, maxy: 12 }, 
-        { minx: 36, miny: 8, maxx: 45, maxy: 11 }, 
-        { minx: 32, miny: 22, maxx: 52, maxy: 22 },
-        { minx: 32, miny: 29, maxx: 51, maxy: 29 }, 
-        { minx: 2, miny: 19, maxx: 14, maxy: 28 }, 
-      ]
-      let coordPair = coordsArray[Math.floor(Math.random()*(5-0))]
-      let { minx, miny, maxx, maxy } = coordPair;
-      let r = 16; //resolution
-      if(coord=='x') 
-        return Math.ceil(Math.random() * (maxx - minx ) + minx) * r - 2;
-      if(coord=='y')
-        return Math.ceil(Math.random() * (maxy - miny ) + miny) * r - 2;
-    }
 
     assetUnique.forEach(asset =>{
       let i = 0;
@@ -392,10 +441,11 @@ class PhaserGame extends Component{
       }
 
       assetGroup.forEach(asset =>{
-        asset.coordx = coordinateRange('x');
-        asset.coordy = coordinateRange('y');
+        let { x , y } = this.coordinateRange()
+        asset.coordx = x;
+        asset.coordy = y;
       })
-      assets = [...assets, ...assetGroup];
+      assets = [  ...assets, ...assetGroup, ];
     });
 
    
@@ -445,7 +495,7 @@ class PhaserGame extends Component{
     // Enable Physics //
     game.physics.startSystem(Phaser.Physics.P2JS);
     game.physics.p2.setImpactEvents(true);
-    game.physics.p2.restitution = this.state.restitution;
+    //game.physics.p2.restitution = this.state.restitution;
 
     // Set Collision Groups // 
     let charCG = game.physics.p2.createCollisionGroup();
@@ -453,20 +503,25 @@ class PhaserGame extends Component{
     let wallsCG = game.physics.p2.createCollisionGroup();
     
     //Layer Generation with Asset Generator embedded
+    let tiles;
     layers = layers.map( layer => {
       layer.variable = map.createLayer(layer.name);
       if(layer.name === 'foregrounddetails')
         assets = this.generateAsset(assets, game, charCG, otherCG, wallsCG);
       if(layer.collision){
         map.setCollisionBetween(1, 999, true, layer.name);
-        let tiles = game.physics.p2.convertTilemap(map, layer.name);
+        tiles = game.physics.p2.convertTilemap(map, layer.name);
         tiles.forEach(tile=>{
           tile.setCollisionGroup(wallsCG);
           tile.collides(charCG);
           tile.collides(otherCG);
         }) 
       }
-      return layer
+    });
+
+    tiles.forEach(tile =>{
+      let charBody = assets[0].variable.body;
+      charBody.createBodyCallback(tile, this.noVelocity, this)
     });
     
     this.shadowTexture = this.game.add.bitmapData(this.game.width + 20, this.game.height + 20);
@@ -510,14 +565,27 @@ class PhaserGame extends Component{
   }
 
   render(){
+    let { ednerd, pleblo, jdog, brains } = this.state
     if(!this.state.gamestart){
       return <div><Menu startGame={this.startGame}/> </div>
+    }
+    if(!ednerd&&!pleblo&&!jdog&&!brains){
+      return <div>
+        <Menu startGame={this.startGame} win={true}/>
+        <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter} dead={this.state.dead}/>
+      </div>
+    }
+    if(this.state.health<=0){
+      return <div>
+        <Menu startGame={this.startGame} win={false}/>
+        <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter} dead={this.state.dead}/>
+      </div>
     }
     return(
         <div>
           <StatusBar props={this.state} lightSwitch={this.lightSwitch}/>
           <div id="phaser-container"/>
-          <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter}/>
+          <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter} dead={this.state.dead}/>
         </div>
     )
   }
