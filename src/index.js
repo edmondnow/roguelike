@@ -53,6 +53,12 @@ class PhaserGame extends Component{
   }
 
   attack(player, enemy){
+
+    this.setState({ movement: false, health: this.state.health - enemy.sprite.dmg });
+    setTimeout( ()=>{
+      this.setState({ movement: true })
+    }, 500)
+
     let { cursors } = this;
     if(enemy.sprite.hp > 0){
       enemy.sprite.animations.play('hit');
@@ -93,10 +99,6 @@ class PhaserGame extends Component{
       this.setState({lvl: this.state.lvl + 1, xp: remainder, xpthreshold: this.state.xpthreshold + 50, dmg: this.state.dmg + 20})
     }
 
-    this.setState({ movement: !this.state.movement, health: this.state.health - enemy.sprite.dmg });
-    setTimeout( ()=>{
-      this.setState({ movement: !this.state.movement })
-    }, 500)
 
   }
 
@@ -163,7 +165,8 @@ class PhaserGame extends Component{
     bossCoordinates.forEach(coord =>{
       if((x>coord.x-p&&x<coord.x + p)&&(y>coord.y-p&&y<coord.y + p)){
        if(this.state[coord.name]&&this.state.encounter!=coord.name){
-        this.setState({movement: true, encounter: coord.name})
+        this.setState({encounter: coord.name});
+        this.char.animations.play('idle');
        }
       }
     });
@@ -495,7 +498,7 @@ class PhaserGame extends Component{
     // Enable Physics //
     game.physics.startSystem(Phaser.Physics.P2JS);
     game.physics.p2.setImpactEvents(true);
-    //game.physics.p2.restitution = this.state.restitution;
+    game.physics.p2.restitution = 3;
 
     // Set Collision Groups // 
     let charCG = game.physics.p2.createCollisionGroup();
@@ -544,7 +547,19 @@ class PhaserGame extends Component{
     if(this.state.movement){
       body.velocity.y = 0;
       body.velocity.x = 0;
-      if (cursors.left.isDown){
+      if(cursors.up.isDown && cursors.right.isDown){
+        body.moveUp(speed);
+        char.animations.play('up');
+      } else if(cursors.up.isDown && cursors.left.isDown){
+        body.moveUp(speed);
+        char.animations.play('up');
+      } else if(cursors.down.isDown && cursors.left.isDown){
+        body.moveDown(speed);
+        char.animations.play('down');
+      } else if(cursors.down.isDown && cursors.right.isDown){
+        body.moveDown(speed);
+        char.animations.play('down');
+      } else if (cursors.left.isDown){
         body.moveLeft(speed);
         char.animations.play('left');
       } else if(cursors.right.isDown){
@@ -555,7 +570,7 @@ class PhaserGame extends Component{
         char.animations.play('up');
       } else if(cursors.down.isDown){
         body.moveDown(speed);
-       char.animations.play('down');
+        char.animations.play('down');
       } else if (cursors.down.isUp && cursors.up.isUp && cursors.left.isUp && cursors.right.isUp){
         char.animations.play('idle');
       }

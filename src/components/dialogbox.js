@@ -81,20 +81,14 @@ class DialogBox extends Component{
       brains: [{who: 'brains', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
       jdog: [{who: 'jdog', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
     }
-    let deaths = {
-      pleblo: [{who: 'pleblo', say: ['Hi, Marty', 'I am ded', 'Yaddaayayaya']}],
-      ednerd: [{who: 'ednerd', say: ['Hi, Marty', 'I am ded', 'Yaddaayayaya']}],
-      brains: [{who: 'brains', say: ['Hi, Marty', 'I am ded', 'Yaddaayayaya']}],
-      jdog: [{who: 'jdog', say: ['Hi, Marty', 'I am ded', 'Yaddaayayaya']}],
-    }
     
-    if(prevProps.encounter!=this.props.encounter&&this.props.encounter!=null){
+    if(prevProps.encounter!=this.props.encounter){
       this.setState({currentDialog: encounters[this.props.encounter], show: true})
       this.props.movementAllow()
     }
 
-    if(prevProps.dead!=this.props.dead&&this.props.dead!=null){
-      this.setState({currentDialog: deaths[this.props.dead], show: true})
+  if(prevProps.encounter!=this.props.encounter){
+      this.setState({currentDialog: encounters[this.props.encounter], show: true})
       this.props.movementAllow()
     }
 
