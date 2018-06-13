@@ -1,4 +1,4 @@
-import React, { Component } from 'react' ;
+import react, { Component } from 'react' ;
 import ReactDOM from 'react-dom';
 import StatusBar from './components/statusbar';
 import DialogBox from './components/dialogbox';

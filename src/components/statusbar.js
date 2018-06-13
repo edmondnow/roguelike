@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import react, { Component } from 'react';
 
 const StatusBar = (props) => {
   const { lvl, dmg, health, weapon, xp, xpthreshold, lights} = props.props
