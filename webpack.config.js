@@ -20,6 +20,7 @@ module.exports = {
     extensions: ['.js', '.jsx']
   },
   devServer: {
+    port: process.env.PORT,
     historyApiFallback: true,
     contentBase: './',
     watchOptions: {
