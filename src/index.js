@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react' ;
 import ReactDOM from 'react-dom';
 import StatusBar from './components/statusbar';
 import DialogBox from './components/dialogbox';
-import Menu from './components/menu';
+import MenuBar from './components/menu';
 
 class PhaserGame extends Component{
   constructor(props){
@@ -582,17 +582,17 @@ class PhaserGame extends Component{
   render(){
     let { ednerd, pleblo, jdog, brains } = this.state
     if(!this.state.gamestart){
-      return <div><Menu startGame={this.startGame}/> </div>
+      return <div><MenuBar startGame={this.startGame}/> </div>
     }
     if(!ednerd&&!pleblo&&!jdog&&!brains){
       return <div>
-        <Menu startGame={this.startGame} win={true}/>
+        <MenuBar startGame={this.startGame} win={true}/>
         <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter} dead={this.state.dead}/>
       </div>
     }
     if(this.state.health<=0){
       return <div>
-        <Menu startGame={this.startGame} win={false}/>
+        <MenuBar startGame={this.startGame} win={false}/>
         <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter} dead={this.state.dead}/>
       </div>
     }
