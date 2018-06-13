@@ -1,7 +1,7 @@
 import React, { Component } from 'react' ;
 import ReactDOM from 'react-dom';
-import StatusBar from './components/statusbar';
-import DialogBox from './components/dialogbox';
+import StatusBar from './components/statusbar.js';
+import DialogBox from './components/dialogbox.js';
 import MenuBar from './components/menu';
 
 class PhaserGame extends Component{
