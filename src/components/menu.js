@@ -1,4 +1,4 @@
-import react, { Component } from 'react';
+import React, { Component } from 'react';
 
 let Menu = props =>{
   let defaultText = 'Use your <img id="arrows" src="./src/assets/arrows.png" alt="arrows" /> and bump into monsters!';
