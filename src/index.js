@@ -404,7 +404,6 @@ class PhaserGame extends Component{
     skeletonboss.dmg = 30;
     skeletonboss.xp = 70;
     skeletonboss.coordy = 400;
-    skeletonboss.debug = true;
     skeletonboss.rect.ox = -5;
     skeletonboss.rect.oy = +10;
     skeletonboss.boss = 'skeletonboss'
