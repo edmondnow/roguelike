@@ -15,12 +15,11 @@ class DialogBox extends Component{
       nextAllow: false,
       startDelay: 2000,
       imgsrc: 'goblin',
-      titles: { brains:'NoBrains CereBro', pleblo: 'Pleblo ElMago', jdog: 'J-Dog the HellHound', ednerd: 'Ednerd Gobbler' },
-      imgs: { brains: 'skeleton', pleblo: 'wizard', ednerd: 'goblin', jdog: 'hound' },
+      titles: { skeletonboss:'Boney Bob', wizardboss: 'Harry Urawizurd', houndboss: 'Toto', goblinboss: 'Griphook the Gobbler' },
+      imgs: { skeletonboss: 'skeleton', wizardboss: 'wizard', goblinboss: 'goblin', houndboss: 'hound' },
       show: true,
       actorIt: 0,
-      dialogIt: 0,
-
+      dialogIt: 1,
     }
 
     this.dialogControl = this.dialogControl.bind(this);
@@ -34,22 +33,21 @@ class DialogBox extends Component{
     var current = this.state.currentDialog;
     var selected = current[this.state.actorIt];
 
-    if(e.keyCode==32&&this.state.nextAllow){
+
+    if((e.keyCode==32&&this.state.nextAllow)){
 
      if(this.state.dialogIt===selected.say.length){
         actorIt++;
         if(this.state.actorIt===current.length){
           actorIt = 0;
-          this.setState({actorIt: 0, dialogIt: 0})
+          this.setState({actorIt: 0, dialogIt: 1})
         } else {
-          this.setState({actorIt: actorIt, dialogIt: 0})
-          
+          this.setState({actorIt: actorIt, dialogIt: 1})
         }
-        
      }
     
     if(this.state.actorIt>=current.length){
-      this.setState({show: !this.state.show, actorIt: 0, dialogIt: 0});
+      this.setState({show: !this.state.show, actorIt: 0, dialogIt: 1});
       this.props.movementAllow();
       return;
     }
@@ -66,30 +64,46 @@ class DialogBox extends Component{
     }
       
   }
-  
-  
+    
   resetDialog(){
     this.setState({nextAllow: true})
   }
   
-
-
   componentDidUpdate(prevProps, prevState, snapshot){
     let encounters = {
-      pleblo: [{who: 'pleblo', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
-      ednerd: [{who: 'ednerd', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
-      brains: [{who: 'brains', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
-      jdog: [{who: 'jdog', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
+      wizardboss: [{who: 'wizardboss', say: ['Hi, Player', 'Blabalablaba', 'Yaddaayayaya']}],
+      goblinboss: [{who: 'goblinboss', say: ['Hi, Encounter', 'Blabalablaba', 'Yaddaayayaya']}],
+      skeletonboss: [{who: 'skeletonboss', say: ['Hi, Encounter', 'Blabalablaba', 'Yaddaayayaya']}],
+      houndboss: [{who: 'houndboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
+    }
+
+    let deaths = {
+      wizardboss: [{who: 'wizardboss', say: ["I'm dead", 'Blabalablaba', 'Yaddaayayaya']}],
+      goblinboss: [{who: 'goblinboss', say: ["I'm dead", 'Blabalablaba', 'Yaddaayayaya']}],
+      skeletonboss: [{who: 'skeletonboss', say: ["I'm dead", 'Blabalablaba', 'Yaddaayayaya']}],
+      houndboss: [{who: 'houndboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
     }
     
-    if(prevProps.encounter!=this.props.encounter){
-      this.setState({currentDialog: encounters[this.props.encounter], show: true})
-      this.props.movementAllow()
+    if(prevProps.dead!=this.props.dead){
+      this.setState({
+      imgsrc: this.state.imgs[deaths[this.props.dead][0].who],
+      currentDialog: deaths[this.props.dead],
+      currentText: deaths[this.props.dead][0].say[0],
+      currentTitle: this.state.titles[deaths[this.props.dead][0].who],
+      show: true
+      })
+      this.props.movementDeny()
     }
 
   if(prevProps.encounter!=this.props.encounter){
-      this.setState({currentDialog: encounters[this.props.encounter], show: true})
-      this.props.movementAllow()
+      this.setState({
+        imgsrc: this.state.imgs[encounters[this.props.encounter][0].who],
+        currentDialog: encounters[this.props.encounter],
+        currentText: encounters[this.props.encounter][0].say[0],
+        currentTitle: this.state.titles[encounters[this.props.encounter][0].who],
+        show: true
+      })
+      this.props.movementDeny()
     }
 
   }
@@ -97,13 +111,18 @@ class DialogBox extends Component{
   componentDidMount(){
     document.addEventListener("keydown", this.dialogControl, false)
     let initial = [
-      {who: 'pleblo', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-      //{who: 'ednerd', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-      //{who: 'jdog', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-      //{who: 'brains', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}
+      {who: 'wizardboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
+      //{who: 'goblinboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
+      //{who: 'houndboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
+      //{who: 'skeletonboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}
     ]
-
-    this.setState({currentDialog: initial})
+    this.setState({
+      currentDialog: initial,
+      currentText: initial[0].say[0],
+      currentTitle: this.state.titles[initial[0].who],
+      imgsrc: this.state.imgs[initial[0].who],
+      show: true
+      })
   }
 
   componentWillUnmount(){
@@ -111,7 +130,6 @@ class DialogBox extends Component{
   }
 
   render(){
-
     return (  
       <div className="dialogbox" onKeyDown={this.dialogControl} style={{visibility: this.state.show ? 'initial' : 'hidden'}}>
         <div className="avatarDiv">
@@ -132,7 +150,6 @@ class DialogBox extends Component{
             </span>
         </div>
       </div>
-
     )
   }
 }

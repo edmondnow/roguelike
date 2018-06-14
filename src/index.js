@@ -11,18 +11,18 @@ class PhaserGame extends Component{
 
     this.state = {
       movement: false,
-      health: 1000,
+      health: 100,
       xp: 0,
-      xpthreshold: 200,
+      xpthreshold: 100,
       lvl: 1,
-      dmg: 1,
+      dmg: 10,
       weapon: `${path}/sword.png`,
       lights: true,
       gamestart: false,
-      pleblo: true,
-      ednerd: true,
-      jdog: true,
-      brains: true,
+      wizardboss: true,
+      goblinboss: true,
+      houndboss: true,
+      skeletonboss: true,
       encounter: null,
       dead: null,
       allcoords: []
@@ -39,13 +39,18 @@ class PhaserGame extends Component{
     this.lightSwitch = this.lightSwitch.bind(this);
     this.startGame = this.startGame.bind(this);
     this.movementAllow = this.movementAllow.bind(this);
+    this.movementDeny = this.movementDeny.bind(this);
     this.coordinateRange = this.coordinateRange.bind(this);
     this.noVelocity = this.noVelocity.bind(this)
   }
 
  
   movementAllow(){
-    this.setState({movement: !this.state.movement})
+    this.setState({movement: true})
+  }
+
+  movementDeny(){
+    this.setState({movement: false})
   }
   
   lightSwitch(){
@@ -91,7 +96,7 @@ class PhaserGame extends Component{
         }
         setTimeout(()=>{
           enemy.sprite.kill();
-        }, 700)
+        }, 600)
       }
   
     if(this.state.xp>=this.state.xpthreshold){
@@ -157,10 +162,10 @@ class PhaserGame extends Component{
     x = Math.floor(x);
     y = Math.floor(y);
     let bossCoordinates = [
-    { name: 'ednerd', x:390, y:45 },
-    { name: 'pleblo', x:136, y:360 },
-    { name: 'brains', x:580, y:400 },
-    { name: 'jdog', x:650, y:150 },
+    { name: 'goblinboss', x:390, y:45 },
+    { name: 'wizardboss', x:136, y:360 },
+    { name: 'skeletonboss', x:580, y:400 },
+    { name: 'houndboss', x:650, y:150 },
      ]
     bossCoordinates.forEach(coord =>{
       if((x>coord.x-p&&x<coord.x + p)&&(y>coord.y-p&&y<coord.y + p)){
@@ -178,14 +183,14 @@ class PhaserGame extends Component{
     body.velocity.x = 0;
     body.velocity.y = 0;
     potion.sprite.kill();
-    this.setState({health: this.state.health + 10});
+    this.setState({health: this.state.health + 30});
   }
 
   dmg(body, weapon){
     body.velocity.x = 0;
     body.velocity.y = 0;
     weapon.sprite.kill();
-    this.setState({dmg: this.state.dmg + 10});
+    this.setState({dmg: this.state.dmg + 5});
   }
 
   coordinateRange(){
@@ -328,7 +333,7 @@ class PhaserGame extends Component{
         ]
        }
 
-    let skel =   { name: 'skel', variable: null,  boss: undefined, type: 'monster', mode: 'atlas', quant:  5, dmg: 10, hp: 50, path: `${path}/skeleton/skeleton`, debug: false,
+    let skel =   { name: 'skel', variable: null,  boss: undefined, type: 'monster', mode: 'atlas', quant:  5, dmg: 15, hp: 60, path: `${path}/skeleton/skeleton`, debug: false,
         coordx: null, xp: 30, coordy: null, scale: 0.9, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 18 , fps: 9 },
           { name: 'dead', count: 15, fps: 16 },
@@ -343,7 +348,7 @@ class PhaserGame extends Component{
         ]
       }
 
-    let gob =  { name: 'gob', xp: 10, boss: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 10, dmg: 5, hp: 40, path: `${path}/goblin/goblin`, debug: false,
+    let gob =  { name: 'gob', xp: 15, boss: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 10, dmg: 10, hp: 30, path: `${path}/goblin/goblin`, debug: false,
         coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright' , count: 7 , fps: 9 },
           { name: 'attackleft' , count: 7 , fps: 9 },
@@ -355,7 +360,7 @@ class PhaserGame extends Component{
         ]
        }
     
-    let wiz =  { name: 'wiz', xp: 40, variable: null, boss: undefined, type: 'monster', mode: 'atlas', quant:  5, dmg: 15, hp: 60, path: `${path}/wizard/wizard`, debug: false,
+    let wiz =  { name: 'wiz', xp: 30, variable: null, boss: undefined, type: 'monster', mode: 'atlas', quant:  5, dmg: 15, hp: 60, path: `${path}/wizard/wizard`, debug: false,
         coordx: null, coordy: null, scale: 0.6, rect: {w: 10 , h: 18 , ox: 0, oy: 0, rotation: null }, anim: [
           { name: 'attackright', count: 8 , fps: 9 },
           { name: 'attackleft' , count: 8 , fps: 9 },
@@ -367,7 +372,7 @@ class PhaserGame extends Component{
         ]
        }
 
-    let hound =  { name: 'hound', xp: 20,  boss: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 7, hp: 20, path: `${path}/hound/hound`, debug: false,
+    let hound =  { name: 'hound', xp: 30,  boss: undefined, variable: null, type: 'monster', mode: 'atlas', quant: 5, dmg: 15, hp: 60, path: `${path}/hound/hound`, debug: false,
         coordx: null, coordy: null, scale: 0.7, rect: {w: 20 , h: 10 , ox: 0, oy: 7, rotation: null }, anim: [
           { name: 'attackleft', count: 6 , fps: 9 },
           { name: 'hitleft' , count: 3 , fps: 5 },
@@ -392,44 +397,56 @@ class PhaserGame extends Component{
     //Specify all assets in an object to iterate over
     let assetUnique = [ potion, sword, skel, gob, wiz, hound ]
     
-    let brains =  Object.assign({}, skel);
-    brains.scale = 1.2;
-    brains.coordx = 580;
-    brains.coordy = 400;
-    brains.debug = true;
-    brains.rect.ox = -5;
-    brains.rect.oy = +10;
-    brains.boss = 'brains'
+    let skeletonboss =  Object.assign({}, skel);
+    skeletonboss.scale = 1.2;
+    skeletonboss.coordx = 580;
+    skeletonboss.hp = 220;
+    skeletonboss.dmg = 30;
+    skeletonboss.xp = 70;
+    skeletonboss.coordy = 400;
+    skeletonboss.debug = true;
+    skeletonboss.rect.ox = -5;
+    skeletonboss.rect.oy = +10;
+    skeletonboss.boss = 'skeletonboss'
 
-    let ednerd = Object.assign({}, gob);
+    let goblinboss = Object.assign({}, gob);
 
-    ednerd.scale = 0.8;
-    ednerd.coordx = 390;
-    ednerd.coordy = 45;
-    ednerd.rect.ox = 0;
-    ednerd.rect.oy = 2;
-    ednerd.boss = 'ednerd';
+    goblinboss.scale = 0.8;
+    goblinboss.hp = 220;
+    goblinboss.dmg = 30;
+    goblinboss.xp = 70;
+    goblinboss.coordx = 390;
+    goblinboss.coordy = 45;
+    goblinboss.rect.ox = 0;
+    goblinboss.rect.oy = 2;
+    goblinboss.boss = 'goblinboss';
 
-    let pleblo = Object.assign({}, wiz);
+    let wizardboss = Object.assign({}, wiz);
 
-    pleblo.scale = 0.7;
-    pleblo.coordx = 136;
-    pleblo.coordy = 360;
-    pleblo.rect.ox = -2;
-    pleblo.rect.w = 17;
-    pleblo.boss = 'pleblo'
+    wizardboss.scale = 0.7;
+    wizardboss.hp = 220;
+    wizardboss.dmg = 30;
+    wizardboss.xp = 70;
+    wizardboss.coordx = 136;
+    wizardboss.coordy = 360;
+    wizardboss.rect.ox = -2;
+    wizardboss.rect.w = 17;
+    wizardboss.boss = 'wizardboss'
 
-    let jdog = Object.assign({}, hound);
+    let houndboss = Object.assign({}, hound);
 
-    jdog.scale = 1;
-    jdog.coordx = 660;
-    jdog.coordy = 150;
-    jdog.rect.w = 30;
-    jdog.boss = 'jdog'
+    houndboss.scale = 1;
+    houndboss.coordx = 660;
+    houndboss.hp = 220;
+    houndboss.dmg = 30;
+    houndboss.xp = 70;
+    houndboss.coordy = 150;
+    houndboss.rect.w = 30;
+    houndboss.boss = 'houndboss'
 
 
 
-    let assets = [char, brains, ednerd, pleblo, jdog];
+    let assets = [char, skeletonboss, goblinboss, wizardboss, houndboss];
     assets.forEach( asset =>{
       this.setState({ allcoords: [ ...this.state.allcoords, { x: asset.coordx, y: asset.coordy } ] })
     })
@@ -580,27 +597,27 @@ class PhaserGame extends Component{
   }
 
   render(){
-    let { ednerd, pleblo, jdog, brains } = this.state
+    let { goblinboss, wizardboss, houndboss, skeletonboss } = this.state
     if(!this.state.gamestart){
       return <div><MenuBar startGame={this.startGame}/> </div>
     }
-    if(!ednerd&&!pleblo&&!jdog&&!brains){
+    if(!goblinboss&&!wizardboss&&!houndboss&&!skeletonboss){
       return <div>
         <MenuBar startGame={this.startGame} win={true}/>
-        <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter} dead={this.state.dead}/>
+        <DialogBox movementAllow={this.movementAllow} movementDeny={this.movementDeny} encounter={this.state.encounter} dead={this.state.dead}/>
       </div>
     }
     if(this.state.health<=0){
       return <div>
         <MenuBar startGame={this.startGame} win={false}/>
-        <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter} dead={this.state.dead}/>
+        <DialogBox movementAllow={this.movementAllow} movementDeny={this.movementDeny} encounter={this.state.encounter} dead={this.state.dead}/>
       </div>
     }
     return(
         <div>
           <StatusBar props={this.state} lightSwitch={this.lightSwitch}/>
           <div id="phaser-container"/>
-          <DialogBox movementAllow={this.movementAllow} encounter={this.state.encounter} dead={this.state.dead}/>
+          <DialogBox movementAllow={this.movementAllow} movementDeny={this.movementDeny}encounter={this.state.encounter} dead={this.state.dead}/>
         </div>
     )
   }
