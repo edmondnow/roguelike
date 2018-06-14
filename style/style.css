@@ -124,6 +124,10 @@ canvas {
   background-color: rgb(60, 40, 53);
 }
 
+#dialog {
+  font-size: 1.4em
+}
+
 #avatar{
   margin: 0;
   height: 170px;
@@ -134,8 +138,10 @@ canvas {
 
 #title {
   text-align: left;
-  margin-bottom: 10px;
-  font-size: 1.6em;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+  color: white;
+  text-shadow: 0px 0px 2px gray;
 }
 #text-box {
   text-align: justify;

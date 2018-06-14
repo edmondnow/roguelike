@@ -13,7 +13,7 @@ class DialogBox extends Component{
       currentText: null,
       currentTitle: null,
       nextAllow: false,
-      startDelay: 2000,
+      startDelay: 1000,
       imgsrc: 'goblin',
       titles: { skeletonboss:'Boney Bob', wizardboss: 'Harry Urawizurd', houndboss: 'Toto', goblinboss: 'Griphook the Gobbler' },
       imgs: { skeletonboss: 'skeleton', wizardboss: 'wizard', goblinboss: 'goblin', houndboss: 'hound' },
@@ -42,7 +42,7 @@ class DialogBox extends Component{
           actorIt = 0;
           this.setState({actorIt: 0, dialogIt: 1})
         } else {
-          this.setState({actorIt: actorIt, dialogIt: 1})
+          this.setState({actorIt: actorIt, dialogIt: 0})
         }
      }
     
@@ -71,17 +71,17 @@ class DialogBox extends Component{
   
   componentDidUpdate(prevProps, prevState, snapshot){
     let encounters = {
-      wizardboss: [{who: 'wizardboss', say: ['Hi, Player', 'Blabalablaba', 'Yaddaayayaya']}],
-      goblinboss: [{who: 'goblinboss', say: ['Hi, Encounter', 'Blabalablaba', 'Yaddaayayaya']}],
-      skeletonboss: [{who: 'skeletonboss', say: ['Hi, Encounter', 'Blabalablaba', 'Yaddaayayaya']}],
-      houndboss: [{who: 'houndboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
+      wizardboss: [{who: 'wizardboss', say: ['Hagrid said I am a wizard!', 'It must be true...']}],
+      goblinboss: [{who: 'goblinboss', say: ['You thought you can defeat us?', 'I shall feast on your innerds.', 'Gobble gobble gobble!']}],
+      skeletonboss: [{who: 'skeletonboss', say: ['Yoo, bud!', 'Nothing personal, all business. I was gutted once too, ya know.']}],
+      houndboss: [{who: 'houndboss', say: ['woof woof', '*wags tail*', "PSYCH!"]}],
     }
 
     let deaths = {
-      wizardboss: [{who: 'wizardboss', say: ["I'm dead", 'Blabalablaba', 'Yaddaayayaya']}],
-      goblinboss: [{who: 'goblinboss', say: ["I'm dead", 'Blabalablaba', 'Yaddaayayaya']}],
-      skeletonboss: [{who: 'skeletonboss', say: ["I'm dead", 'Blabalablaba', 'Yaddaayayaya']}],
-      houndboss: [{who: 'houndboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}],
+      wizardboss: [{who: 'wizardboss', say: ["Hagruuuud...", "I'm a wizurddh..."]}],
+      goblinboss: [{who: 'goblinboss', say: ["You bested me foe!", 'I shall gobble on the plains of my ancestors now...']}],
+      skeletonboss: [{who: 'skeletonboss', say: ["Thanks... for freeing me, bud!", "Clonk... Clack..."]}],
+      houndboss: [{who: 'houndboss', say: ['Guess the jokes on me...', '*howls with gurgling blood in throath']}],
     }
     
     if(prevProps.dead!=this.props.dead){
@@ -111,10 +111,10 @@ class DialogBox extends Component{
   componentDidMount(){
     document.addEventListener("keydown", this.dialogControl, false)
     let initial = [
-      {who: 'wizardboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-      //{who: 'goblinboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-      //{who: 'houndboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']},
-      //{who: 'skeletonboss', say: ['Hi, Marty', 'Blabalablaba', 'Yaddaayayaya']}
+      {who: 'wizardboss', say: ['Hi, there?', 'Are you here to witness JS awesomness?']},
+      {who: 'goblinboss', say: ['Well, too bad, cause you have too read the code for that.']},
+      {who: 'houndboss', say: ["Or...", "Alternatively, you can visit freeCodeCamp.org." ]},
+      {who: 'skeletonboss', say: ["We're only here to dismember you."]}
     ]
     this.setState({
       currentDialog: initial,
