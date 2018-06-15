@@ -73,15 +73,15 @@ class DialogBox extends Component{
     let encounters = {
       wizardboss: [{who: 'wizardboss', say: ['Hagrid said I am a wizard!', 'It must be true...']}],
       goblinboss: [{who: 'goblinboss', say: ['You thought you can defeat us?', 'I shall feast on your innerds.', 'Gobble gobble gobble!']}],
-      skeletonboss: [{who: 'skeletonboss', say: ['Yoo, bud!', 'Nothing personal, all business. I was gutted once too, ya know.']}],
+      skeletonboss: [{who: 'skeletonboss', say: ['Yoo, bud!', 'Nothing personal. I was gutted once too, ya know.']}],
       houndboss: [{who: 'houndboss', say: ['woof woof', '*wags tail*', "PSYCH!"]}],
     }
 
     let deaths = {
       wizardboss: [{who: 'wizardboss', say: ["Hagruuuud...", "I'm a wizurddh..."]}],
-      goblinboss: [{who: 'goblinboss', say: ["You bested me foe!", 'I shall gobble on the plains of my ancestors now...']}],
+      goblinboss: [{who: 'goblinboss', say: ["You bested me foe!", 'I shall gobble on the plains of my ancestors...']}],
       skeletonboss: [{who: 'skeletonboss', say: ["Thanks... for freeing me, bud!", "Clonk... Clack..."]}],
-      houndboss: [{who: 'houndboss', say: ['Guess the jokes on me...', '*howls with gurgling blood in throath']}],
+      houndboss: [{who: 'houndboss', say: ['Guess the jokes on me...', '*howls with gurgling blood in throat.']}],
     }
     
     if(prevProps.dead!=this.props.dead){
