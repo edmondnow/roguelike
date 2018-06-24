@@ -8,6 +8,11 @@ button {
   background-color: white;
 }
 
+
+#instructions {
+  position: absolute;
+  bottom: 20px;
+}
 #arrows {
   width: 40px;
   margin: 0px 5px;
@@ -150,6 +155,7 @@ canvas {
   font-family: 'Visitor', Verdana, Tahoma;
   font-size: 1.2em;
   line-height: 1.2em;
+  position: relative;
 }
 
 

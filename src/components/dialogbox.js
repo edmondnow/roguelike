@@ -148,6 +148,7 @@ class DialogBox extends Component{
               { this.state.currentText }
             </Typist>
             </span>
+            <span id="instructions">Use SPACE to forward the dialog or ESC to skip </span>
         </div>
       </div>
     )
