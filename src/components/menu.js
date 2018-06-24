@@ -11,7 +11,7 @@ let Menu = props =>{
         (props.win==true ? <div id="ins" dangerouslySetInnerHTML={{__html: loseText}} /> :  <div id="ins" dangerouslySetInnerHTML={{__html: winText}} />): 
       <div id="ins" dangerouslySetInnerHTML={{__html: defaultText}} /> }
       <button id="menubutton" onClick={props.startGame}>{props.win!=undefined ? 'RELOAD' : 'NEW GAME'}</button>
-      <span id="fullscreen">Use fullscreen (F11) for best experience </span>
+      <div id="fullscreen">Use <span className="ins-color">fullscreen</span> for best experience </div>
     </div>
   )
 }

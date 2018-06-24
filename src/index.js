@@ -170,7 +170,7 @@ class PhaserGame extends Component{
     bossCoordinates.forEach(coord =>{
       if((x>coord.x-p&&x<coord.x + p)&&(y>coord.y-p&&y<coord.y + p)){
        if(this.state[coord.name]&&this.state.encounter!=coord.name){
-        this.setState({encounter: coord.name});
+        this.setState({encounter: coord.name, [coord.name]: false});
         this.char.animations.play('idle');
        }
       }
@@ -292,6 +292,8 @@ class PhaserGame extends Component{
         charBody.collides(otherCG);
         charBody.collides(wallsCG);
         charBody.damping = 0.99
+        charBody.sprite.animations.play('idle');
+
       } else {
         body.setCollisionGroup(otherCG);
         body.collides(charCG);
@@ -386,7 +388,7 @@ class PhaserGame extends Component{
         ]
        }
 
-    let potion = { name: 'potion', variable: null, type: 'item', mode: 'image', quant: 5, path: `${path}/potion`, debug: false,
+    let potion = { name: 'potion', variable: null, type: 'item', mode: 'image', quant: 10, path: `${path}/potion`, debug: false,
         coordx: 190, coordy: 155, scale: 0.8, rect: {w: 7 , h: 7.5 , ox: -1, oy: 4, rotation: null }
       }
     
@@ -609,7 +611,6 @@ class PhaserGame extends Component{
     if(this.state.health<=0){
       return <div>
         <MenuBar startGame={this.startGame} win={false}/>
-        <DialogBox movementAllow={this.movementAllow} movementDeny={this.movementDeny} encounter={this.state.encounter} dead={this.state.dead}/>
       </div>
     }
     return(

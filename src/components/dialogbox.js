@@ -33,8 +33,13 @@ class DialogBox extends Component{
     var current = this.state.currentDialog;
     var selected = current[this.state.actorIt];
 
+    if(e.keyCode==27){
+      this.setState({show: !this.state.show, actorIt: 0, dialogIt: 1})
+      this.props.movementAllow();
+      return;
+    }
 
-    if((e.keyCode==32&&this.state.nextAllow)){
+    if(e.keyCode==32&&this.state.nextAllow){
 
      if(this.state.dialogIt===selected.say.length){
         actorIt++;
@@ -111,7 +116,7 @@ class DialogBox extends Component{
   componentDidMount(){
     document.addEventListener("keydown", this.dialogControl, false)
     let initial = [
-      {who: 'wizardboss', say: ['Hi, there?', 'Are you here to witness JS awesomness?']},
+      {who: 'wizardboss', say: ['Hi there!', 'Are you here to witness JS awesomness?']},
       {who: 'goblinboss', say: ['Well, too bad, cause you have too read the code for that.']},
       {who: 'houndboss', say: ["Or...", "Alternatively, you can visit freeCodeCamp.org." ]},
       {who: 'skeletonboss', say: ["We're only here to dismember you."]}
@@ -148,7 +153,7 @@ class DialogBox extends Component{
               { this.state.currentText }
             </Typist>
             </span>
-            <span id="instructions">Use SPACE to forward the dialog or ESC to skip </span>
+            <div id="instructions">Use <span className="ins-color">SPACE</span> to forward the dialog or <span className="ins-color">ESC</span> to skip </div>
         </div>
       </div>
     )
